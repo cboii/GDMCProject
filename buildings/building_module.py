@@ -12,6 +12,11 @@ class BuildingModule:
     def place_module(self, editor: Editor, start: Vec3iLike):
         build_area = editor.getBuildArea()
 
+        with editor.pushTransform(Transform(translation=build_area.offset+start)):
+            for coords, block in self.blocks.items():
+                editor.placeBlock(coords, block)
+            
+    def place_module_global(self, editor: Editor, start: Vec3iLike):
         with editor.pushTransform(Transform(translation=start)):
             for coords, block in self.blocks.items():
                 editor.placeBlock(coords, block)
@@ -27,7 +32,7 @@ def scan_module(editor: Editor, name: str):
         module.blocks[(x-build_area.offset.x,y-build_area.offset.y,z-build_area.offset.z)] = editor.loadWorldSlice().getBlockGlobal((x,y,z))
 
     script_location = Path(__file__).absolute().parent
-    file_location = script_location / f"./buildingModules/{name}.pkl"
+    file_location = script_location / f"buildingModules/{name}.pkl"
     
     with open(file_location, 'wb') as f:
         pickle.dump(module, f)
@@ -35,7 +40,7 @@ def scan_module(editor: Editor, name: str):
 def build_module(editor: Editor, name: str, start: Vec3iLike):
    
     script_location = Path(__file__).absolute().parent
-    file_location = script_location / f"./buildingModules/{name}.pkl"
+    file_location = script_location / f"buildingModules/{name}.pkl"
     with open(file_location, 'rb') as f:
         module = pickle.load(f)
 
@@ -43,9 +48,7 @@ def build_module(editor: Editor, name: str, start: Vec3iLike):
 
 def main():
     editor = Editor()
-    scan_module(editor, "test")
+    scan_module(editor, "HouseGroundFloorWoodCornerSE")
 
 if __name__ == "__main__":
     main()
-
-
