@@ -46,9 +46,20 @@ def build_module(editor: Editor, name: str, start: Vec3iLike):
 
     module.place_module(editor, start)
 
+def build_module_global(editor: Editor, name: str, start: Vec3iLike):
+   
+    script_location = Path(__file__).absolute().parent
+    file_location = script_location / f"buildingModules/{name}.pkl"
+    with open(file_location, 'rb') as f:
+        module = pickle.load(f)
+
+    module.place_module_global(editor, start)
+
 def main():
     editor = Editor()
-    scan_module(editor, "HouseGroundFloorWoodCornerSE")
+    name = "HouseGroundFloorWoodStairs"
+    scan_module(editor, name)
+    build_module(editor, name, (-17,-60,-39))
 
 if __name__ == "__main__":
     main()
