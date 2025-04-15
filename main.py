@@ -15,6 +15,7 @@ if __name__ == "__main__":
     build_map = BuildMap(editor)
     step_size = 16
     gaussian = True
-    visualize_grid(build_map, step_size=step_size, gaussian=gaussian)
+    radius = 2
+    visualize_grid(build_map, step_size=step_size, gaussian=gaussian, radius=radius)
     tm = TerrainManipulator(editor, build_map)
-    tm.place_plateau_at_town_center(gaussian=gaussian, step_size=step_size)
+    tm.place_plateau_at_town_center(gaussian=gaussian, step_size=step_size, radius=radius)
