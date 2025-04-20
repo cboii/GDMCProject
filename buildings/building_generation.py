@@ -41,10 +41,8 @@ def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
                 
                 if y == 0: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_BOTTOM])
-                    inner = False
                 elif y == tile_array_size.y-1: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_TOP])
-                    inner = False
                 
                 if z == 0: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_NORTH])
@@ -54,7 +52,7 @@ def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
                     inner = False
                 
                 if inner:
-                    building_modules_for_tile = tile_rules[TILES_INNER]
+                    building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_INNER])
                 
                 tile_array[x,y,z].add_possible_modules({name: tile_directions[name] for name in list(building_modules_for_tile)})
 
@@ -74,15 +72,24 @@ def wave_function_collapse(tile_array: npt.NDArray[any],
                            first_tile_module: str = None):
     first_tile = tile_array[first_tile_grid_pos.x,first_tile_grid_pos.y,first_tile_grid_pos.z]
     
-    assert(first_tile_module in first_tile.possible_modules, "Module not possible for this tile")
+    assert first_tile_module in first_tile.possible_modules, "Module not possible for this tile"
     first_tile.set_possible_modules({first_tile_module: first_tile.possible_modules[first_tile_module]})
     first_tile.select()
     for i in range(tile_array.size-1):
-        entropies = [tile.entropy if tile.entropy > 0 else 256 for tile in tile_array.flat]
-        print(entropies)
-        print(np.argmin(entropies))
+        print()
+        print()
+        print()
+        entropies = []
+        for tile in tile_array.flat:
+            entropy = 256
+            for nb in tile.neighbors.values():
+                if nb.entropy == 0 and tile.entropy != 0:
+                    entropy = tile.entropy
+            entropies.append(entropy)
+            tile.updated = False
+
         x,y,z = np.unravel_index(np.array(np.argmin(entropies)), tile_array.shape)
-        print(f"({x},{y},{z})")
+        print(f"SELECTING TILE ({x},{y},{z}).")
         tile_array[x,y,z].select()
     return tile_array
 
