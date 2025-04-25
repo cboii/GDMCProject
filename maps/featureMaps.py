@@ -62,23 +62,27 @@ class MapFeatureExtractor:
         for x in range(0,length-1):
             for z in range(0,width):
                 map_posX[x,z] = heightmap[x+1,z]-heightmap[x,z]
-                map_sum[x,z] = map_posX[x,z]**2
+                # map_sum[x,z] = map_posX[x,z]**2
+                map_sum[x,z] += abs(map_posX[x,z])
         
         for x in range(1,length):
             for z in range(0,width):
                 map_negX[x,z] = heightmap[x-1,z]-heightmap[x,z]
+                map_sum[x,z] += abs(map_negX[x,z])
         
         for z in range(0,width-1):
             for x in range(0,length):
                 map_posZ[x,z] = heightmap[x,z+1]-heightmap[x,z]
-                map_sum[x,z] += map_posZ[x,z]**2
+                # map_sum[x,z] += map_posZ[x,z]**2
+                map_sum[x,z] += abs(map_posZ[x,z])
         
         for z in range(1,width):
             for x in range(0,length):
                 map_negZ[x,z] = heightmap[x,z-1]-heightmap[x,z]
+                map_sum[x,z] += abs(map_negZ[x,z])
 
 
-        return map_posX, map_negX, map_posZ, map_negZ, np.sqrt(map_sum)
+        return map_posX, map_negX, map_posZ, map_negZ, map_sum
     
     def create_heightmap(self):
         return self.world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]

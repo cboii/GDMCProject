@@ -1,7 +1,9 @@
 from .featureMaps import MapFeatureExtractor
-from .buildMaps import BuildMap
+from .blueprint import Blueprint
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage import data, segmentation, color
+from skimage import graph
 
 def visualize_map_features(map_features: MapFeatureExtractor):
     f, axes = plt.subplots(1, 3)
@@ -14,11 +16,11 @@ def visualize_map_features(map_features: MapFeatureExtractor):
 
     plt.show()
 
-def visualize_grid(map: BuildMap, step_size, gaussian=False, radius=1):
+def visualize_grid(map: Blueprint, step_size, gaussian=False, radius=1):
     f, axes = plt.subplots(1,3)
     area = map.get_buildable_area(map.steepness_map, map.ground_water_map, step_size=2, gaussian=True)
     town_center = map.get_town_center(gaussian=gaussian, step_size=step_size, radius=radius)
-    _, _, _, subregion = map.get_subregion(town_center[1], region_size=step_size)
+    _, _, _, subregion = map.get_subregion(town_center[1], region_size=step_size, gaussian=True)
     axes[0].imshow(area, cmap='magma', interpolation='nearest', origin='lower')
     axes[0].set_title('Grid')
     axes[1].imshow(town_center[0], cmap='magma', interpolation='nearest', origin='lower')
