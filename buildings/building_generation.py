@@ -54,7 +54,7 @@ def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
                 if inner:
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_INNER])
                 
-                tile_array[x,y,z].add_possible_modules({name: tile_directions[name] for name in list(building_modules_for_tile)})
+                tile_array[x,y,z].add_possible_modules({module: tile_directions[module] for module in list(building_modules_for_tile)})
 
                 if x > 0: tile_array[x,y,z].set_neighbor(WEST, tile_array[x-1,y,z])
                 if x < tile_array_size.x-1: tile_array[x,y,z].set_neighbor(EAST, tile_array[x+1,y,z])
