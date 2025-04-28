@@ -68,13 +68,14 @@ def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
 
 
 def wave_function_collapse(tile_array: npt.NDArray[any],
+                           tile_weights: list,
                            first_tile_grid_pos: ivec3 = None, 
                            first_tile_module: str = None):
     first_tile = tile_array[first_tile_grid_pos.x,first_tile_grid_pos.y,first_tile_grid_pos.z]
     
     assert first_tile_module in first_tile.possible_modules, "Module not possible for this tile"
     first_tile.set_possible_modules({first_tile_module: first_tile.possible_modules[first_tile_module]})
-    first_tile.select()
+    first_tile.select(tile_weights)
     for i in range(tile_array.size-1):
         print()
         print()
@@ -90,21 +91,22 @@ def wave_function_collapse(tile_array: npt.NDArray[any],
 
         x,y,z = np.unravel_index(np.array(np.argmin(entropies)), tile_array.shape)
         print(f"SELECTING TILE ({x},{y},{z}).")
-        tile_array[x,y,z].select()
+        tile_array[x,y,z].select(tile_weights)
     return tile_array
 
 
-from buildingModules.houseGroundFloorWood.tile_rules import tile_rules, tile_directions
+from buildingModules.houseGroundFloorWood.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights
 
 editor = Editor()
+print("Start Tile Array")
 tile_array = create_tile_array(editor.getBuildArea(), tile_rules, tile_directions)
-
-tile_array = wave_function_collapse(tile_array, ivec3(1,0,0), "HouseGroundFloorWood_DoorN")
+print("Start WFC")
+tile_array = wave_function_collapse(tile_array, tile_weights, ivec3(1,0,0), ("HouseGroundFloorWood_Door",0))
 for x in range(len(tile_array)):
     for y in range(len(tile_array[0])):
         for z in range(len(tile_array[0,0])):
             print(f"Pos: {tile_array[x,y,z].grid_pos}, Module: {tile_array[x,y,z].selected_module}")
-            tile_array[x,y,z].build(editor)
+            tile_array[x,y,z].build(editor,variation_weights)
     
     
     

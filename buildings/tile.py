@@ -75,11 +75,14 @@ class Tile:
             for nb in self.neighbors.values():
                     nb.update()
 
-    def select(self):
+    def select(self, tile_weights: dict):
+        module_list = list(self.possible_modules.keys())
+
         if self.entropy == 1:
-            self.selected_module = list(self.possible_modules.keys())[0]
+            self.selected_module = module_list[0]
         elif self.entropy > 1: 
-            self.selected_module = choice(list(self.possible_modules.keys()))
+            weights = [tile_weights[module[0]] for module in module_list]
+            self.selected_module = random.choices(list(self.possible_modules.keys()), weights=weights, k=1)[0]
             self.possible_modules = {self.selected_module: self.possible_modules[self.selected_module]}
         else:
             print("Entropy = 0")
@@ -88,5 +91,15 @@ class Tile:
         for dir, nb in self.neighbors.items():
             nb.update()
 
-    def build(self, editor: Editor):
-        build_module_global(editor, self.selected_module, self.pos)
+    def build(self, editor: Editor, variation_weights: dict):
+        module, rotation = self.selected_module
+        print(f"Module: {module}, Variation weight keys: {variation_weights.keys()}")
+        if module in variation_weights.keys():
+            if rotation == 4:
+                rotation = random.randint(0,3)
+            module_name = random.choices(list(variation_weights[module].keys()), list(variation_weights[module].values()), k=1)[0]
+        elif module == "Air":
+            module_name = "Air"
+        else:
+            module_name = f"{module}#0"
+        build_module_global(editor, module_name, self.pos, rotation)
