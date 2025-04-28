@@ -1,4 +1,4 @@
-from random import choice
+import random
 from pyglm.glm import ivec3
 from gdpc import Editor
 from building_module import *
@@ -46,7 +46,7 @@ class Tile:
         
         possible_modules_neighbors = {}
         for dir, neighbor in self.neighbors.items():
-            if (neighbor.updated or neighbor.entropy == 0) and neighbor.possible_modules.keys() != ["Air"]:
+            if (neighbor.updated or neighbor.entropy == 0) and list(neighbor.possible_modules.keys())[0] != ["Air"]:
                 possible_modules_neighbors[dir] = neighbor.possible_modules
 
         possible_for_tile_per_neighbor = []
