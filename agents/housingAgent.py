@@ -5,65 +5,80 @@ from terrain.terrain_manipulator import TerrainManipulator
 from .agentClass import Agent
 from .plots import PlotType
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.ndimage import label
 from scipy import ndimage
-from skimage.segmentation import find_boundaries
 from scipy.signal import convolve2d
 
 
 class HousingAgent(Agent):
 
-    def __init__(self, blueprint):
+    def __init__(self, blueprint, step_size = 32):
         super().__init__(blueprint)
         self.max_distance_to_road = 2
         self.max_slope = 2
         self.type = PlotType.HOUSE
-        self.min_size = 16
-        self.max_size = 20
+        
         self.min_border_size = 1
+        self.step_size = step_size
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
-        self.min_coords = [10,10]
-        self.max_coords = [11,12]
+        area, begin = self.blueprint.get_town_center(step_size=step_size)
+        end = [begin[0] + step_size - 1, begin[1] + step_size - 1]
+        print(begin, end)
+        self.min_coords = begin
+        self.max_coords = end
 
-    def find_suitable_build_areas(self, expansion = 4, execute = False):
+        self.min_width=8
+        self.min_height=8
+        self.max_width=14
+        self.max_height=14
+        self.min_size = self.min_width * self.min_height
+
+
+    def find_suitable_build_areas(self, execute = False):
+        expansion = self.step_size // 2
         if not self.blueprint.houses.any(where=lambda x: x):
             pass
         else:
             indices = np.argwhere(self.blueprint.houses)
-            print(self.min_coords)
-            print(self.max_coords)
 
-            expansion_bottom_left = expansion
-            expansion_top_right = expansion
+            expansion_left = expansion
+            expansion_right = expansion
+            expansion_top = expansion
+            expansion_bottom = expansion
 
-            if (self.min_coords[0] - expansion < 0 or self.min_coords[1] - expansion < 0) and (self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1) or self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1)):
+            if (self.min_coords[0] - expansion < 0 and self.min_coords[1] - expansion < 0) and (self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1) and self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1)):
                 raise IndexError("Borders reached")
             
-            elif self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1) or self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1):
-                expansion_top_right = 0
-                expansion_bottom_left = expansion
+            if self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1):
+                expansion_top = 0
                 print("Upper Border reached")
-
-            elif self.min_coords[0] - expansion < 0 or self.min_coords[1] - expansion < 0:
-                expansion_bottom_left = 0
-                expansion_top_right = expansion
+            
+            if self.min_coords[1] - expansion < 0:
+                expansion_bottom = 0
                 print("Lower Border reached")
 
+            if self.min_coords[0] - expansion < 0:
+                expansion_left = 0
+                print("Left Border reached")
+
+            if self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1):
+                expansion_right = 0
+                print("Right Border reached")
+
             
             
-            region_size = max([(self.max_coords[0] + expansion_top_right) - (self.min_coords[0] - expansion_bottom_left) + 1, (self.max_coords[1] + expansion_top_right) - (self.min_coords[1] - expansion_bottom_left) + 1])
+            region_size = max([(self.max_coords[0] + expansion_right) - (self.min_coords[0] - expansion_left) + 1, (self.max_coords[1] + expansion_top) - (self.min_coords[1] - expansion_bottom) + 1])
             
-            height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((self.min_coords[0] - expansion_bottom_left, self.min_coords[1] - expansion_bottom_left), region_size=region_size, gaussian=False)
+            height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom), region_size=region_size, gaussian=False)
             
             buildable_areas = steepness_map < self.max_slope
             buildable_areas &= ~(ground_water_map != 255)
 
             # buildable_areas = subregion
 
-            build_mask = np.logical_and(buildable_areas, ~self.blueprint.houses[(self.min_coords[0] - expansion_bottom_left): (self.min_coords[0] - expansion_bottom_left) + region_size, (self.min_coords[1] - expansion_bottom_left): (self.min_coords[1] - expansion_bottom_left) + region_size])
+            build_mask = np.logical_and(buildable_areas, ~self.blueprint.houses[(self.min_coords[0] - expansion_left): (self.min_coords[0] - expansion_left) + region_size, (self.min_coords[1] - expansion_bottom): (self.min_coords[1] - expansion_bottom) + region_size])
             
-            build_mask&=(self.blueprint.map[(self.min_coords[0] - expansion_bottom_left): (self.min_coords[0] - expansion_bottom_left) + region_size, (self.min_coords[1] - expansion_bottom_left): (self.min_coords[1] - expansion_bottom_left) + region_size] == 0)
+            build_mask&=(self.blueprint.map[(self.min_coords[0] - expansion_left): (self.min_coords[0] - expansion_left) + region_size, (self.min_coords[1] - expansion_bottom): (self.min_coords[1] - expansion_bottom) + region_size] == 0)
         
 
             labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
@@ -88,15 +103,15 @@ class HousingAgent(Agent):
                 region_mask = (labeled_array == label_id)
                 region_size = np.sum(region_mask)
 
-                box = self.extract_random_box_and_border(region_mask, min_width=6, min_height=6, max_width=13, max_height=13, border=1)
+                box = self.extract_random_box_and_border(region_mask, self.min_width, self.min_height, self.max_width, self.max_height, border=1)
 
                 if box != None:
                     
                     break
             
             if box == None:
-                self.min_coords = [self.min_coords[0] - expansion_bottom_left, self.min_coords[1] - expansion_bottom_left]
-                self.max_coords = [self.max_coords[0] + expansion_top_right, self.max_coords[1] + expansion_top_right]
+                self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
+                self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
                 raise ValueError
 
             sub_region = box[0]
@@ -112,8 +127,8 @@ class HousingAgent(Agent):
             indices = np.argwhere(house_area)
             indices_borders = np.argwhere(border_mask)
 
-            offset_coords = indices + np.array([self.min_coords[0] - expansion_bottom_left, self.min_coords[1] - expansion_bottom_left])
-            offset_coords_border = indices_borders + np.array([self.min_coords[0] - expansion_bottom_left, self.min_coords[1] - expansion_bottom_left])
+            offset_coords = indices + np.array([self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom])
+            offset_coords_border = indices_borders + np.array([self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom])
             
 
             self.place(offset_coords)
@@ -123,8 +138,8 @@ class HousingAgent(Agent):
                 w, h = [offset_coords[-1][0] - offset_coords[0][0] + 1, offset_coords[-1][1] - offset_coords[0][1] + 1]
                 self.terrain_manipulator.place_base(offset_coords[0], w, h)
 
-        self.min_coords = [self.min_coords[0] - expansion_bottom_left, self.min_coords[1] - expansion_bottom_left]
-        self.max_coords = [self.max_coords[0] + expansion_top_right, self.max_coords[1] + expansion_top_right]
+        # self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
+        # self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
 
     def evaluate_location_fitness(self, loc):
         pass

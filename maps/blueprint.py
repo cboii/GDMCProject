@@ -43,37 +43,71 @@ class Blueprint:
                     self.map[x,y]=50
 
     def show(self):
-        plt.imshow(self.map)
+        plt.imshow(np.rot90(self.map), interpolation='nearest', origin='lower')
         plt.show()
 
 
     @staticmethod
-    def get_buildable_area(steepness_map: np.ndarray, ground_water_map: np.ndarray, step_size = 4, gaussian = False, radius = 1):
+    def get_buildable_area(steepness_map: np.ndarray,
+                       ground_water_map: np.ndarray,
+                       step_size=4,
+                       gaussian=False,
+                       radius=1):
 
-        buildable_regions = np.empty((int(steepness_map.shape[0]/step_size), int(steepness_map.shape[1]/step_size)), dtype=float) 
-        for x in range(0, steepness_map.shape[0], step_size):
-            for z in range(0, steepness_map.shape[1], step_size):
+        x_size = (steepness_map.shape[0] + step_size - 1) // step_size
+        z_size = (steepness_map.shape[1] + step_size - 1) // step_size
+        buildable_regions = np.empty((x_size, z_size), dtype=float)
 
-                buildable_regions[round(x/(steepness_map.shape[0] - step_size) * (steepness_map.shape[0]/step_size - 1)), round(z/(steepness_map.shape[1] - step_size) * (steepness_map.shape[1]/step_size - 1))] = np.mean(steepness_map[x: x + step_size,z: z + step_size])
+        for i in range(x_size):
+            for j in range(z_size):
+                x_start = i * step_size
+                x_end   = min(x_start + step_size, steepness_map.shape[0])
+                z_start = j * step_size
+                z_end   = min(z_start + step_size, steepness_map.shape[1])
+                buildable_regions[i, j] = np.mean(steepness_map[x_start:x_end, z_start:z_end])
 
-        # Exclude water
-        max = np.max(buildable_regions)
-        for x in range(0, steepness_map.shape[0], step_size):
-            for z in range(0, steepness_map.shape[1], step_size):
-                
-                if np.any(ground_water_map[x: x + step_size,z: z + step_size] != 255): 
-                    buildable_regions[round(x/(steepness_map.shape[0] - step_size) * (steepness_map.shape[0]/step_size - 1)), round(z/(steepness_map.shape[1] - step_size) * (steepness_map.shape[1]/step_size - 1))] = max
+        max_val = np.max(buildable_regions)
+        for i in range(x_size):
+            for j in range(z_size):
+                x_start = i * step_size
+                x_end   = min(x_start + step_size, steepness_map.shape[0])
+                z_start = j * step_size
+                z_end   = min(z_start + step_size, steepness_map.shape[1])
+                if np.any(ground_water_map[x_start:x_end, z_start:z_end] != 255):
+                    buildable_regions[i, j] = max_val
 
         if gaussian:
             buildable_regions = gaussian_filter(buildable_regions, sigma=1, radius=radius)
-        
+
         return buildable_regions
+
+    # @staticmethod
+    # def get_buildable_area(steepness_map: np.ndarray, ground_water_map: np.ndarray, step_size = 4, gaussian = False, radius = 1):
+
+    #     buildable_regions = np.empty((int(steepness_map.shape[0]/step_size), int(steepness_map.shape[1]/step_size)), dtype=float) 
+    #     for x in range(0, steepness_map.shape[0], step_size):
+    #         for z in range(0, steepness_map.shape[1], step_size):
+
+    #             buildable_regions[round(x/(steepness_map.shape[0] - step_size) * (steepness_map.shape[0]/step_size - 1)), round(z/(steepness_map.shape[1] - step_size) * (steepness_map.shape[1]/step_size - 1))] = np.mean(steepness_map[x: x + step_size,z: z + step_size])
+
+    #     # Exclude water
+    #     max = np.max(buildable_regions)
+    #     for x in range(0, steepness_map.shape[0], step_size):
+    #         for z in range(0, steepness_map.shape[1], step_size):
+                
+    #             if np.any(ground_water_map[x: x + step_size,z: z + step_size] != 255): 
+    #                 buildable_regions[round(x/(steepness_map.shape[0] - step_size) * (steepness_map.shape[0]/step_size - 1)), round(z/(steepness_map.shape[1] - step_size) * (steepness_map.shape[1]/step_size - 1))] = max
+
+    #     if gaussian:
+    #         buildable_regions = gaussian_filter(buildable_regions, sigma=1, radius=radius)
+        
+    #     return buildable_regions
     
     def get_town_center(self, step_size=32, gaussian=False, radius=1):
         b_area = self.get_buildable_area(self.steepness_map, self.ground_water_map, step_size=step_size, gaussian=gaussian, radius=radius)
         rel_pos = np.array(np.unravel_index(np.argmin(b_area), b_area.shape))
-        rel_pos = (rel_pos[0]*step_size, rel_pos[1]*step_size)
         
+        rel_pos = [rel_pos[0]*step_size, rel_pos[1]*step_size]
         return b_area, rel_pos
     
     def get_subregion(self, pos, region_size = 32, gaussian=False):
