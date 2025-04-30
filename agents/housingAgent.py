@@ -8,6 +8,7 @@ import numpy as np
 from scipy.ndimage import label
 from scipy import ndimage
 from scipy.signal import convolve2d
+from .roadAgent import RoadConnectorAgent
 
 
 class HousingAgent(Agent):
@@ -17,25 +18,28 @@ class HousingAgent(Agent):
         self.max_distance_to_road = 2
         self.max_slope = 2
         self.type = PlotType.HOUSE
-        
+
         self.min_border_size = 1
         self.step_size = step_size
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
-        area, begin = self.blueprint.get_town_center(step_size=step_size)
+        _, begin = self.blueprint.get_town_center(step_size=step_size)
         end = [begin[0] + step_size - 1, begin[1] + step_size - 1]
-        print(begin, end)
         self.min_coords = begin
         self.max_coords = end
+
+        self.road_connector = RoadConnectorAgent(self.blueprint)
+        self.road_connector.place([[begin[0]  + step_size // 2, begin[1] + step_size // 2]])
 
         self.min_width=8
         self.min_height=8
         self.max_width=14
         self.max_height=14
         self.min_size = self.min_width * self.min_height
+        
 
 
     def find_suitable_build_areas(self, execute = False):
-        expansion = self.step_size // 2
+        expansion = self.step_size - 1
         if not self.blueprint.houses.any(where=lambda x: x):
             pass
         else:
@@ -133,6 +137,7 @@ class HousingAgent(Agent):
 
             self.place(offset_coords)
             self.blueprint.place(offset_coords_border, PlotType.BORDER)
+            self.road_connector.connect_to_road_network(offset_coords_border, execute=execute)
 
             if execute:
                 w, h = [offset_coords[-1][0] - offset_coords[0][0] + 1, offset_coords[-1][1] - offset_coords[0][1] + 1]
@@ -140,6 +145,7 @@ class HousingAgent(Agent):
 
         # self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
         # self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
+
 
     def evaluate_location_fitness(self, loc):
         pass

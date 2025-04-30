@@ -20,9 +20,10 @@ if __name__ == "__main__":
 
     # removeTrees(editor)
     mapFeatures = MapFeatureExtractor(editor)
-    # visualize_map_features(mapFeatures)
+    visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
-    blueprint.place([[10, 10]], type=PlotType.HOUSE)
+    blueprint.place([[1,10]], type=PlotType.HOUSE)
+    # blueprint.place([[150, 150]], type=PlotType.ROAD)
     road_agent = RoadExtendorAgent(blueprint)
     house_agent = HousingAgent(blueprint, step_size=step_size)
 
@@ -31,8 +32,8 @@ if __name__ == "__main__":
             house_agent.find_suitable_build_areas(execute=True)
         except IndexError:
             break
-        except ValueError:
-            print("None placed!")
+        except ValueError as e:
+            print(e)
 
     visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
     blueprint.show()

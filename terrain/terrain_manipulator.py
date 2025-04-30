@@ -33,3 +33,8 @@ class TerrainManipulator:
             for z in range(loc[1], loc[1] + h):
                 for y in range(max_height - area_height[x - loc[0],z - loc[1]]):
                     self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + x, self.blueprint.height_map[x,z] + y - 1, self.blueprint.map_features.build_area.offset.z + z), Block("cobblestone"))
+
+        
+    def place_road_segment(self, loc):
+        for l in loc:
+            self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
