@@ -51,6 +51,7 @@ class Tile:
 
         possible_for_tile_per_neighbor = []
         for dir, p_modules in possible_modules_neighbors.items():
+            print(dir)
             possible_for_tile_in_neighbor = set()
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])

@@ -1,6 +1,6 @@
 from gdpc import Editor
-from gdpc.vector_tools import Box
-from pyglm.glm import ivec3
+from gdpc.vector_tools import Box, Rect
+from pyglm.glm import ivec3, ivec2
 import numpy as np
 import numpy.typing as npt
 from tile import *
@@ -16,8 +16,8 @@ TILES_SOUTH = 5
 TILES_WEST = 6
 TILES_BOTTOM = 7
 
-def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
-    tile_array_size = area.size // TILE_SIZE
+def create_tile_array(area: Box, floors: int, tile_rules: list, tile_directions: dict):
+    tile_array_size = (area.size.x // TILE_SIZE.x, floors, area.size.z // TILE_SIZE.z)
     tile_array = np.array([[[Tile((x,y,z), 
                                   (area.offset.x + TILE_SIZE.x * x, 
                                    area.offset.y + TILE_SIZE.y * y, 
@@ -41,8 +41,10 @@ def create_tile_array(area: Box, tile_rules: list, tile_directions: dict):
                 
                 if y == 0: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_BOTTOM])
+                    inner = False
                 elif y == tile_array_size.y-1: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_TOP])
+                    inner = False
                 
                 if z == 0: 
                     building_modules_for_tile = building_modules_for_tile.intersection(tile_rules[TILES_NORTH])
@@ -95,18 +97,20 @@ def wave_function_collapse(tile_array: npt.NDArray[any],
     return tile_array
 
 
-from buildingModules.houseGroundFloorWood.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights
 
-editor = Editor()
+from buildingModules.House.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights
+
+editor = Editor(buffering=True)
 print("Start Tile Array")
 tile_array = create_tile_array(editor.getBuildArea(), tile_rules, tile_directions)
 print("Start WFC")
-tile_array = wave_function_collapse(tile_array, tile_weights, ivec3(1,0,0), ("HouseGroundFloorWood_Door",0))
+tile_array = wave_function_collapse(tile_array, tile_weights, ivec3(1,0,0), ("House_Wood_GF_Door",0))
 for x in range(len(tile_array)):
     for y in range(len(tile_array[0])):
         for z in range(len(tile_array[0,0])):
             print(f"Pos: {tile_array[x,y,z].grid_pos}, Module: {tile_array[x,y,z].selected_module}")
             tile_array[x,y,z].build(editor,variation_weights)
+editor.flushBuffer()
     
     
     

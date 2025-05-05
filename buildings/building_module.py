@@ -73,7 +73,7 @@ def build_module_global(editor: Editor, name: str, start: ivec3, rotation: int):
 
 def main():
     editor = Editor()
-    name = "HouseGroundFloorWood_Ceiling#3"
+    name = "House_Wood_UF_Wall#1"
     scan_module(editor, name)
     build_module_global(editor, name, (-17,-60,-39), 0)
 
