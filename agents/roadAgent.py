@@ -35,9 +35,9 @@ class RoadConnectorAgent(Agent):
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
 
     def connect_to_road_network(self, loc, execute = False):
-        build_map = self.blueprint.map < 1
-        build_map &= self.blueprint.steepness_map <= self.max_slope
-        path, dist = self.find_minimal_path(loc, self.blueprint.road_network, build_map)
+        path, dist = self.find_minimal_path(loc, self.blueprint.road_network)
+        if dist == None:
+            raise CustomError("No optimal path found!")
         self.place(path)
 
         if execute:
@@ -50,9 +50,10 @@ class RoadConnectorAgent(Agent):
 
     def find_minimal_path(self, rect_coords,
                            network: np.ndarray,
-                           traversable: np.ndarray,
                            connectivity: int = 4) -> np.ndarray:
-        
+        build_map = self.blueprint.map < 1
+        build_map &= self.blueprint.steepness_map <= self.max_slope
+        traversable = build_map
         if connectivity not in (4, 8):
             raise CustomError("connectivity must be 4 or 8")
         if network.ndim != 2 or traversable.ndim != 2:
@@ -122,6 +123,8 @@ class RoadConnectorAgent(Agent):
             while cur not in starts:
                 cur = prev[cur]
                 path_mask[cur] = True
+        else:
+            return None, None
 
         return np.argwhere(path_mask), len(np.argwhere(path_mask))
 

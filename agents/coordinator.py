@@ -41,10 +41,10 @@ class AgentCoordinator:
                                     activation_step=25,
                                     priority=1,
                                     max_slope=1,
-                                    min_width=6, 
-                                    min_height=6, 
-                                    max_width=15, 
-                                    max_height=15,
+                                    min_width=15, 
+                                    min_height=15, 
+                                    max_width=20, 
+                                    max_height=20,
                                     max_plots=5)
         self.church_agent = ChurchAgent(blueprint=blueprint, 
                                         search_area=[self.min_coords, self.max_coords], 
@@ -100,7 +100,7 @@ class AgentCoordinator:
 
             chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute)
         else:
-            raise NoneTypeAgent("No agent available")
+            raise NoneTypeAgent("No agent available!")
 
     def generate(self, steps):
         for i in range(steps):

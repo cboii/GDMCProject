@@ -1,3 +1,4 @@
+import numpy as np
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
 
@@ -34,3 +35,12 @@ class FarmAgent(StructuralAgent):
         self.min_height=min_height
         self.max_width=max_width
         self.max_height=max_height
+
+    def evaluate(self, loc):
+        _, dist = self.road_connector_agent.find_minimal_path(loc, self.blueprint.road_network)
+        if dist == None:
+            return -np.inf
+        _, dist_to_own = self.find_minimal_path_to_own_kind(loc, self.blueprint.farms)
+        if dist_to_own == None:
+            return -dist
+        return -dist_to_own
