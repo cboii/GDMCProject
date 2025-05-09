@@ -1,5 +1,6 @@
 import numpy as np
 
+from Error import CustomError
 from terrain.terrain_manipulator import TerrainManipulator
 from .agentClass import Agent
 from .plots import PlotType
@@ -9,21 +10,14 @@ from collections import deque
 
 class RoadExtendorAgent(Agent):
 
-    def __init__(self, blueprint, step_size = 32):
+    def __init__(self, blueprint, search_area):
         super().__init__(blueprint)
         self.type = PlotType.ROAD
         self.max_width = 3
         self.max_slope = 1
 
-        self.step_size = step_size
-        area, begin = self.blueprint.get_town_center(step_size=step_size)
-        end = [begin[0] + step_size - 1, begin[1] + step_size - 1]
-        self.min_coords = begin
-        self.max_coords = end
-
-
-    def evaluate_location_fitness(self, loc):
-        pass
+        self.min_coords = search_area[0]
+        self.max_coords = search_area[1]
 
     def place(self, loc):
         super().place(loc)
@@ -42,8 +36,8 @@ class RoadConnectorAgent(Agent):
 
     def connect_to_road_network(self, loc, execute = False):
         build_map = self.blueprint.map < 1
-        build_map &= self.blueprint.steepness_map < 2
-        path, dist = self.find_minimal_path_with_path(loc, self.blueprint.road_network, build_map)
+        build_map &= self.blueprint.steepness_map <= self.max_slope
+        path, dist = self.find_minimal_path(loc, self.blueprint.road_network, build_map)
         self.place(path)
 
         if execute:
@@ -54,20 +48,17 @@ class RoadConnectorAgent(Agent):
         super().place(loc)
         pass
 
-    def evaluate_location_fitness(self, loc):
-        pass
-
-    def find_minimal_path_with_path(self, rect_coords,
+    def find_minimal_path(self, rect_coords,
                            network: np.ndarray,
                            traversable: np.ndarray,
                            connectivity: int = 4) -> np.ndarray:
         
         if connectivity not in (4, 8):
-            raise ValueError("connectivity must be 4 or 8")
+            raise CustomError("connectivity must be 4 or 8")
         if network.ndim != 2 or traversable.ndim != 2:
-            raise ValueError("network and traversable must be 2D arrays")
+            raise CustomError("network and traversable must be 2D arrays")
         if network.shape != traversable.shape:
-            raise ValueError("network and traversable must have the same shape")
+            raise CustomError("network and traversable must have the same shape")
 
         h, w = network.shape
 
@@ -76,13 +67,13 @@ class RoadConnectorAgent(Agent):
             try:
                 r, c = int(p[0]), int(p[1])
             except Exception:
-                raise ValueError(f"Invalid coordinate format: {p}")
+                raise CustomError(f"Invalid coordinate format: {p}")
             if not (0 <= r < h and 0 <= c < w):
-                raise ValueError(f"rect coord {(r, c)} out of bounds")
+                raise CustomError(f"rect coord {(r, c)} out of bounds")
             coords.append((r, c))
 
         if not coords:
-            raise ValueError("rect_coords must contain at least one coordinate")
+            raise CustomError("rect_coords must contain at least one coordinate")
 
         rect = np.zeros_like(network, dtype=bool)
         for r, c in coords:

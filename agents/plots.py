@@ -6,4 +6,5 @@ class PlotType(Enum):
     HOUSE = 2
     FARM = 3
     WELL = 4
-    BORDER=5
+    BORDER = 5
+    CHURCH = 6

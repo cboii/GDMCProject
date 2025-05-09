@@ -7,6 +7,7 @@ from maps.blueprint import Blueprint
 from agents.roadAgent import RoadExtendorAgent
 from agents.plots import PlotType
 from agents.housingAgent import HousingAgent
+from agents.coordinator import AgentCoordinator
 import numpy as np
 
 
@@ -22,20 +23,10 @@ if __name__ == "__main__":
     mapFeatures = MapFeatureExtractor(editor)
     visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
-    blueprint.place([[1,10]], type=PlotType.HOUSE)
-    # blueprint.place([[150, 150]], type=PlotType.ROAD)
-    road_agent = RoadExtendorAgent(blueprint)
-    house_agent = HousingAgent(blueprint, step_size=step_size)
 
-    for i in range(20):
-        try:
-            house_agent.find_suitable_build_areas(execute=True)
-        except IndexError:
-            break
-        except ValueError as e:
-            print(e)
+    coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size)
+
+    coordinator.generate(20)
 
     visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
     blueprint.show()
-    tm = TerrainManipulator(blueprint)
-    # tm.place_plateau_at_town_center(gaussian=gaussian, step_size=step_size, radius=radius)
