@@ -4,6 +4,7 @@ from gdpc.vector_tools import Box
 from pyglm.glm import ivec3
 import pickle
 from pathlib import Path
+from random import choice
 
 TILE_SIZE = ivec3(3,4,3)
 
@@ -17,12 +18,18 @@ ROTATION_E = 1
 ROTATION_S = 2
 ROTATION_W = 3
 
+FLOWER_VARIATIONS = ["dandelion", "poppy", "blue_orchid", "allium", 
+                     "azure_bluet", "red_tulip", "orange_tulip", 
+                     "white_tulip", "pink_tulip", "oxeye_daisy", 
+                     "cornflower", "lily_of_the_valley"]
+
 class BuildingModule:
     def __init__(self, name: str, blocks: dict = {}):
         self.name = name
         self.blocks = blocks
 
     def place_module(self, editor: Editor, start: ivec3, rotation: int):
+        self.randomize_flowers()
         build_area = editor.getBuildArea()
         target_box = Box(start+build_area.offset, TILE_SIZE)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
@@ -30,10 +37,21 @@ class BuildingModule:
                 editor.placeBlock(coords, block)
             
     def place_module_global(self, editor: Editor, start: ivec3, rotation: int):
+        self.randomize_flowers()
         target_box = Box(start, TILE_SIZE)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
                 editor.placeBlock(coords, block)
+
+    def change_wood_type(self, type: str):
+        for block in self.blocks.values():
+            block.id = block.id.replace("oak", type)
+
+    def randomize_flowers(self):
+        for block in self.blocks.values():
+            if block.id == "minecraft:dandelion":
+                flower = choice(FLOWER_VARIATIONS)
+                block.id = block.id.replace("dandelion", flower)
     
 
 def scan_module(editor: Editor, name: str):
@@ -61,21 +79,21 @@ def get_module_from_pkl(name: str):
         module = pickle.load(f)
     return module
 
-def build_module(editor: Editor, name: str, start: ivec3, rotation: int):
+def build_module(editor: Editor, name: str, start: ivec3, rotation: int, wood_type: str="oak"):
     module = get_module_from_pkl(name)
-
+    module.change_wood_type(wood_type)
     module.place_module(editor, start, rotation)
 
-def build_module_global(editor: Editor, name: str, start: ivec3, rotation: int):
+def build_module_global(editor: Editor, name: str, start: ivec3, rotation: int, wood_type: str="oak"):
     module = get_module_from_pkl(name)
-
+    module.change_wood_type(wood_type)
     module.place_module_global(editor, start, rotation)
 
 def main():
     editor = Editor()
-    name = "House_Wood_UF_Wall#1"
+    name = "House_Wood_GF_Corner#0"
     scan_module(editor, name)
-    build_module_global(editor, name, (-17,-60,-39), 0)
+    build_module_global(editor, name, (-17,-60,-39), 0, "spruce")
 
 if __name__ == "__main__":
     main()
