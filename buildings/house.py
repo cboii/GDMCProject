@@ -18,12 +18,12 @@ def build_wooden_house(editor: Editor, area: Rect, floors: int = 2, foundation_b
         for y in range(len(tile_array[0])):
             for z in range(len(tile_array[0,0])):
                 print(f"Pos: {tile_array[x,y,z].grid_pos}, Module: {tile_array[x,y,z].selected_module}")
-                tile_array[x,y,z].build(editor,variation_weights)
+                tile_array[x,y,z].build(editor,variation_weights,wood_type)
     
     build_wooden_roof(editor, tile_array, wood_type)
 
     editor.flushBuffer()
 
 editor = Editor(buffering=True)
-area = Rect((0,0), (19, 15))
-build_wooden_house(editor, area, floors=2)
+area = Rect((0,0), (19, 19))
+build_wooden_house(editor, area, floors=2, wood_type="spruce")

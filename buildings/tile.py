@@ -93,7 +93,7 @@ class Tile:
         for dir, nb in self.neighbors.items():
             nb.update()
 
-    def build(self, editor: Editor, variation_weights: dict):
+    def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak"):
         module, rotation = self.selected_module
         print(f"Module: {module}, Variation weight keys: {variation_weights.keys()}")
         if module in variation_weights.keys():
@@ -104,4 +104,4 @@ class Tile:
             module_name = "Air"
         else:
             module_name = f"{module}#0"
-        build_module_global(editor, module_name, self.pos, rotation)
+        build_module_global(editor, module_name, self.pos, rotation, wood_type)
