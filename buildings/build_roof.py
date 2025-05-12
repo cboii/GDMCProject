@@ -85,6 +85,6 @@ def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str)
         elif width % 2 == 1:
             placeCuboid(editor, (width//2, i, -1), (width//2, i, length-1+1), Block(planks_name))
             placeCuboid(editor, (width//2, i+1, -1), (width//2, i+1, length-1+1), Block(slab_name))
-            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block(log_name))
-            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block(log_name))
+            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block(planks_name))
+            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block(planks_name))
     
