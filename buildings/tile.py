@@ -3,6 +3,7 @@ from pyglm.glm import ivec3
 from gdpc import Editor
 from building_module import *
 
+TILE_SIZE = ivec3(3,4,3)
 
 NORTH = 0
 EAST = 1
@@ -18,8 +19,8 @@ class Tile:
         self.entropy = 0
         self.neighbors = {}
         self.selected_module = None
-        self.pos = pos
-        self.grid_pos = grid_pos
+        self.pos = ivec3(pos)
+        self.grid_pos = ivec3(grid_pos)
         self.updated = False
 
     def add_possible_modules(self, modules: dict):

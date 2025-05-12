@@ -1,11 +1,9 @@
 from gdpc import Editor
-from gdpc.vector_tools import Box, Rect
-from pyglm.glm import ivec3, ivec2
+from gdpc.vector_tools import Box
+from pyglm.glm import ivec3
 import numpy as np
 import numpy.typing as npt
 from tile import *
-
-TILE_SIZE = ivec3(3,4,3)
 
 TILES_ALL = 0
 TILES_INNER = 1
@@ -17,7 +15,7 @@ TILES_WEST = 6
 TILES_BOTTOM = 7
 
 def create_tile_array(area: Box, floors: int, tile_rules: list, tile_directions: dict):
-    tile_array_size = (area.size.x // TILE_SIZE.x, floors, area.size.z // TILE_SIZE.z)
+    tile_array_size = ivec3(area.size.x // TILE_SIZE.x, floors, area.size.z // TILE_SIZE.z)
     tile_array = np.array([[[Tile((x,y,z), 
                                   (area.offset.x + TILE_SIZE.x * x, 
                                    area.offset.y + TILE_SIZE.y * y, 
@@ -73,6 +71,7 @@ def wave_function_collapse(tile_array: npt.NDArray[any],
                            tile_weights: list,
                            first_tile_grid_pos: ivec3 = None, 
                            first_tile_module: str = None):
+    first_tile_grid_pos = ivec3(first_tile_grid_pos)
     first_tile = tile_array[first_tile_grid_pos.x,first_tile_grid_pos.y,first_tile_grid_pos.z]
     
     assert first_tile_module in first_tile.possible_modules, "Module not possible for this tile"
@@ -96,21 +95,6 @@ def wave_function_collapse(tile_array: npt.NDArray[any],
         tile_array[x,y,z].select(tile_weights)
     return tile_array
 
-
-
-from buildingModules.House.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights
-
-editor = Editor(buffering=True)
-print("Start Tile Array")
-tile_array = create_tile_array(editor.getBuildArea(), tile_rules, tile_directions)
-print("Start WFC")
-tile_array = wave_function_collapse(tile_array, tile_weights, ivec3(1,0,0), ("House_Wood_GF_Door",0))
-for x in range(len(tile_array)):
-    for y in range(len(tile_array[0])):
-        for z in range(len(tile_array[0,0])):
-            print(f"Pos: {tile_array[x,y,z].grid_pos}, Module: {tile_array[x,y,z].selected_module}")
-            tile_array[x,y,z].build(editor,variation_weights)
-editor.flushBuffer()
     
     
     
