@@ -18,9 +18,9 @@ def visualize_map_features(map_features: MapFeatureExtractor):
 
 def visualize_grid(map: Blueprint, step_size, gaussian=False, radius=1):
     f, axes = plt.subplots(1,3)
-    area = map.get_buildable_area(map.steepness_map, map.ground_water_map, step_size=2, gaussian=True)
-    town_center = map.get_town_center(step_size=step_size, radius=radius)
-    _, _, _, subregion = map.get_subregion(town_center[1], region_size=step_size, gaussian=True)
+    area = map.get_buildable_area(map.steepness_map, map.ground_water_map, step_size=2, gaussian=gaussian, radius=radius)
+    town_center = map.get_town_center(step_size=step_size, gaussian=gaussian, radius=radius)
+    _, _, _, subregion = map.get_subregion(town_center[1], region_size=step_size, gaussian=gaussian, radius=radius)
     axes[0].imshow(np.rot90(area), cmap='magma', interpolation='nearest', origin='lower')
     axes[0].set_title('Grid')
     axes[1].imshow(np.rot90(town_center[0]), cmap='magma', interpolation='nearest', origin='lower')

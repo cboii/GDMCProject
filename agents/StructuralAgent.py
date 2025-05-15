@@ -14,7 +14,6 @@ import numpy as np
 from scipy.ndimage import label
 from scipy import ndimage
 from scipy.signal import convolve2d
-from .roadAgent import RoadConnectorAgent
 
 class StructuralAgent(Agent):
     def __init__(self, 
@@ -35,6 +34,7 @@ class StructuralAgent(Agent):
         self.activation_step = activation_step
         self.priority = priority
         self.max_slope = max_slope
+        self.current_choice = None
 
         self.min_width=min_width
         self.min_height=min_height
@@ -98,7 +98,7 @@ class StructuralAgent(Agent):
 
         return matching_locs
     
-    def choose(self, expansion):
+    def choose(self, expansion, gaussian=False, radius=1):
         expansion = expansion
 
         expansion_left = expansion
@@ -125,7 +125,7 @@ class StructuralAgent(Agent):
         
         region_size = max([(self.max_coords[0] + expansion_right) - (self.min_coords[0] - expansion_left) + 1, (self.max_coords[1] + expansion_top) - (self.min_coords[1] - expansion_bottom) + 1])
         
-        height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom), region_size=region_size, gaussian=False)
+        height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom), region_size=region_size, gaussian=gaussian, radius=radius)
         
         buildable_areas = steepness_map <= self.max_slope
         buildable_areas &= ~(ground_water_map != 255)
@@ -201,7 +201,7 @@ class StructuralAgent(Agent):
 
     def find_minimal_path_to_own_kind(self, rect_coords,
                            network: np.ndarray,
-                           connectivity: int = 4) -> np.ndarray:
+                           connectivity: int = 8) -> np.ndarray:
         build_map = self.blueprint.map < 1
         build_map &= self.blueprint.steepness_map <= self.max_slope
         traversable = build_map

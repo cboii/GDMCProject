@@ -14,19 +14,19 @@ import numpy as np
 if __name__ == "__main__":
     
 
-    editor = Editor()
+    editor = Editor(buffering=True)
     step_size = 32
     gaussian = True
-    radius = 2
+    radius = 1
 
-    # removeTrees(editor)
+    removeTrees(editor)
     mapFeatures = MapFeatureExtractor(editor)
     visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
 
-    coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size)
+    coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(20)
+    coordinator.generate(25, gaussian=gaussian, radius=radius)
 
     visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
     blueprint.show()

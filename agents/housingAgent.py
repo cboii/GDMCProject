@@ -1,14 +1,6 @@
-import itertools
-import random
-
 from terrain.terrain_manipulator import TerrainManipulator
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-import numpy as np
-from scipy.ndimage import label
-from scipy import ndimage
-from scipy.signal import convolve2d
-from .roadAgent import RoadConnectorAgent
 
 
 class HousingAgent(StructuralAgent):
@@ -48,5 +40,3 @@ class HousingAgent(StructuralAgent):
         self.max_width=max_width
         self.max_height=max_height
         self.min_size = self.min_width * self.min_height
-        
-        self.current_choice = []

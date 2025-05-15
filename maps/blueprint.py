@@ -45,6 +45,8 @@ class Blueprint:
                     self.church = True
                 case PlotType.BORDER:
                     self.map[x,y]=25
+                case PlotType.CITYWALL:
+                    self.map[x,y]=225
 
     def show(self):
         plt.imshow(np.rot90(self.map), interpolation='nearest', origin='lower')
@@ -93,11 +95,11 @@ class Blueprint:
         rel_pos = [rel_pos[0]*step_size, rel_pos[1]*step_size]
         return b_area, rel_pos
     
-    def get_subregion(self, pos, region_size = 32, gaussian=False):
+    def get_subregion(self, pos, region_size = 32, gaussian=False, radius=1):
         height_map = self.height_map[pos[0]: pos[0] + region_size, pos[1]: pos[1] + region_size]
         ground_water_map = self.ground_water_map[pos[0]: pos[0] + region_size, pos[1]: pos[1] + region_size]
         steepness_map = self.steepness_map[pos[0]: pos[0] + region_size, pos[1]: pos[1] + region_size]
-        subregion = self.get_buildable_area(steepness_map, ground_water_map, step_size=1, gaussian=gaussian)
+        subregion = self.get_buildable_area(steepness_map, ground_water_map, step_size=1, gaussian=gaussian, radius=radius)
         
         return height_map, ground_water_map, steepness_map, subregion
     
