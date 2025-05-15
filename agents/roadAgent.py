@@ -10,11 +10,11 @@ from collections import deque
 
 class RoadExtendorAgent(Agent):
 
-    def __init__(self, blueprint, search_area):
+    def __init__(self, blueprint, search_area, max_width, max_slope):
         super().__init__(blueprint)
         self.type = PlotType.ROAD
-        self.max_width = 3
-        self.max_slope = 1
+        self.max_width = max_width
+        self.max_slope = max_slope
 
         self.min_coords = search_area[0]
         self.max_coords = search_area[1]
@@ -26,11 +26,11 @@ class RoadExtendorAgent(Agent):
 
 
 class RoadConnectorAgent(Agent):
-    def __init__(self, blueprint):
+    def __init__(self, blueprint, max_width, max_slope):
         super().__init__(blueprint)
         self.type = PlotType.ROAD
-        self.max_width = 3
-        self.max_slope = 1
+        self.max_width = max_width
+        self.max_slope = max_slope
 
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
 
@@ -50,9 +50,10 @@ class RoadConnectorAgent(Agent):
 
     def find_minimal_path(self, rect_coords,
                            network: np.ndarray,
-                           connectivity: int = 4) -> np.ndarray:
+                           connectivity: int = 8) -> np.ndarray:
         build_map = self.blueprint.map < 1
         build_map &= self.blueprint.steepness_map <= self.max_slope
+        build_map &= ~(self.blueprint.ground_water_map != 255)
         traversable = build_map
         if connectivity not in (4, 8):
             raise CustomError("connectivity must be 4 or 8")
