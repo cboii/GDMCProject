@@ -44,9 +44,9 @@ class Blueprint:
                     self.map[x,y]=50
                     self.church = True
                 case PlotType.BORDER:
-                    self.map[x,y]=25
+                    self.map[x,y]=35
                 case PlotType.CITYWALL:
-                    self.map[x,y]=225
+                    self.map[x,y]=15
 
     def show(self):
         plt.imshow(np.rot90(self.map), interpolation='nearest', origin='lower')

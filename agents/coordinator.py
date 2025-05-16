@@ -62,7 +62,7 @@ class AgentCoordinator:
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
                                         priority=3,
-                                        max_slope=15,
+                                        max_slope=30,
                                         min_width=18, 
                                         min_height=18, 
                                         max_width=25, 

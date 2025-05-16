@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(25, gaussian=gaussian, radius=radius)
+    coordinator.generate(5, gaussian=gaussian, radius=radius)
 
     visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
     blueprint.show()
