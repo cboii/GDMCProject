@@ -6,12 +6,9 @@ from  maps.blueprint import Blueprint
 
 class BFS:
     @staticmethod
-    def find_minimal_path_to_network(blueprint: Blueprint, max_slope, rect_coords, 
+    def find_minimal_path_to_network(traversable, rect_coords, 
                            network: np.ndarray,
                            connectivity: int = 8) -> np.ndarray:
-        build_map = blueprint.map < 1
-        build_map &= blueprint.steepness_map <= max_slope
-        traversable = build_map
         if connectivity not in (4, 8):
             raise CustomError("connectivity must be 4 or 8")
         if network.ndim != 2 or traversable.ndim != 2:

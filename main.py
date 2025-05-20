@@ -17,7 +17,8 @@ if __name__ == "__main__":
     editor = Editor(buffering=True)
     step_size = 32
     gaussian = True
-    radius = 1
+    radius = 2
+    border_size = 3
 
     removeTrees(editor)
     mapFeatures = MapFeatureExtractor(editor)
@@ -26,7 +27,7 @@ if __name__ == "__main__":
 
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(5, gaussian=gaussian, radius=radius)
+    coordinator.generate(35, gaussian=gaussian, radius=radius, border_size=border_size)
 
     visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
     blueprint.show()

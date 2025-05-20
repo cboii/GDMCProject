@@ -16,7 +16,8 @@ class FarmAgent(StructuralAgent):
                  min_height, 
                  max_width, 
                  max_height,
-                 max_plots):
+                 max_plots,
+                 outside_walls):
         super().__init__(blueprint, 
                          search_area, 
                          road_connector_agent, 
@@ -27,7 +28,8 @@ class FarmAgent(StructuralAgent):
                          min_height, 
                          max_width, 
                          max_height,
-                         max_plots)
+                         max_plots,
+                         outside_walls)
         
         self.max_distance_to_road = 10
         self.max_slope = max_slope
@@ -39,10 +41,14 @@ class FarmAgent(StructuralAgent):
         self.max_height=max_height
 
     def evaluate(self, loc):
-        _, dist = BFS.find_minimal_path_to_network(self.blueprint, self.road_connector_agent.max_slope, loc, self.blueprint.road_network)
+        build_map = self.blueprint.map < 1
+        build_map &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
+        traversable = build_map
+        _, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
         if dist == None:
             return -np.inf
-        _, dist_to_own = BFS.find_minimal_path_to_network(self.blueprint, self.max_slope, loc, self.blueprint.farms)
+        traversable = np.ones((self.blueprint.map.shape[0], self.blueprint.map.shape[1]), dtype=bool)
+        _, dist_to_own = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.farms)
         if dist_to_own == None:
             return -dist
         return -dist_to_own

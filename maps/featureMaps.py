@@ -40,7 +40,7 @@ class MapFeatureExtractor:
         
         for x in range(0,length):
             for z in range(0,width):
-                for i in range(0,8):
+                for i in range(0,6):
                     if self.world_slice.getBlock((first[0]+x, heightmap[first[0]+x, first[2]+z]-1-i, first[2]+z)).id == "minecraft:water":
                         map[x,z] = i
                         break

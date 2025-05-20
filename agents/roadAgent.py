@@ -36,7 +36,10 @@ class RoadConnectorAgent(Agent):
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
 
     def connect_to_road_network(self, loc, execute = False):
-        path, dist = BFS.find_minimal_path_to_network(self.blueprint, self.max_slope, loc, self.blueprint.road_network)
+        build_map = self.blueprint.map < 1
+        build_map &= self.blueprint.steepness_map <= self.max_slope
+        traversable = build_map
+        path, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
         if dist == None:
             raise CustomError("No optimal path found!")
         self.place(path)

@@ -17,7 +17,9 @@ class Blueprint:
         self.farms: np.ndarray = np.zeros((256,256), dtype=bool)
         self.church: np.ndarray = np.zeros((256,256), dtype=bool)
         self.well: np.ndarray = np.zeros((256,256), dtype=bool)
+        self.city_walls: np.ndarray = np.zeros((256,256), dtype=bool)
         self.map_features = map_features
+        self.outside_walls_area = np.zeros((256,256), dtype=bool)
         self.ground_water_map = self.map_features.create_groundwater_map()
         self.steepness_map = self.map_features.create_gradient_maps()[4]
         self.height_map = self.map_features.create_heightmap()
@@ -42,11 +44,12 @@ class Blueprint:
                     self.well[x,y] = True
                 case PlotType.CHURCH:
                     self.map[x,y]=50
-                    self.church = True
+                    self.church[x,y] = True
                 case PlotType.BORDER:
                     self.map[x,y]=35
                 case PlotType.CITYWALL:
                     self.map[x,y]=15
+                    self.city_walls[x,y]=True
 
     def show(self):
         plt.imshow(np.rot90(self.map), interpolation='nearest', origin='lower')

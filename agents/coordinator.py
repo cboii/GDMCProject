@@ -40,18 +40,19 @@ class AgentCoordinator:
         self.farm_agent = FarmAgent(blueprint=blueprint, 
                                     search_area=[self.min_coords, self.max_coords], 
                                     road_connector_agent=self.road_connector_agent,
-                                    activation_step=12,
+                                    activation_step=8,
                                     priority=1,
-                                    max_slope=2,
+                                    max_slope=3,
                                     min_width=20, 
                                     min_height=20, 
                                     max_width=30, 
                                     max_height=30,
-                                    max_plots=5)
+                                    max_plots=5,
+                                    outside_walls=True)
         self.church_agent = ChurchAgent(blueprint=blueprint, 
                                         search_area=[self.min_coords, self.max_coords], 
                                         road_connector_agent=self.road_connector_agent,
-                                        activation_step=0,
+                                        activation_step=5,
                                         priority=2,
                                         max_slope=2,
                                         min_width=18, 
@@ -62,7 +63,7 @@ class AgentCoordinator:
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
                                         priority=3,
-                                        max_slope=30,
+                                        max_slope=10,
                                         min_width=18, 
                                         min_height=18, 
                                         max_width=25, 
@@ -78,11 +79,11 @@ class AgentCoordinator:
                 self.active_agents.append(agent)
 
 
-    def step(self, execute=True, gaussian=False, radius=1):
+    def step(self, execute=True, gaussian=False, radius=1, border_size=3):
         self.timestep += 1
         self._update_active_agents()
         if len(self.active_agents) == 0:
-            print("No active agent")
+            print("--- No active agent ---")
             return
 
         chosen_agent = None
@@ -92,13 +93,13 @@ class AgentCoordinator:
                 reverse=True
             ):
             try:
-                agent.choose(expansion=32, gaussian=gaussian, radius=radius)
+                agent.choose(expansion=32, gaussian=gaussian, radius=radius, border_size=border_size)
             except IndexError as e:
                 print(e)
                 continue
             if agent.current_choice != None:
                 chosen_agent = agent
-                print(f"Agent of type {agent.type.name} activated!")
+                print(f"--- Agent of type {agent.type.name} activated! ---")
                 break
         
         if chosen_agent != None:
@@ -111,12 +112,20 @@ class AgentCoordinator:
 
             chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute)
         else:
-            raise NoneTypeAgent("No agent available!")
+            raise NoneTypeAgent("--- No agent available! ---")
 
-    def generate(self, steps, gaussian=False, radius=1):
+    def generate(self, steps, gaussian=False, radius=1, border_size=3):
+        
+        city_walls_placed = False
         for i in range(steps):
+            if i >= steps * 1/2 and city_walls_placed == False:
+                success = self.city_wall_agent.try_place()
+                if success:
+                    print("--- City walls placed! ---")
+                    city_walls_placed = True
+                    continue
             try:
-                self.step(gaussian=gaussian, radius=radius)
+                self.step(gaussian=gaussian, radius=radius, border_size=border_size)
             # except IndexError as e:
             #     print(e)
             #     break
@@ -124,9 +133,7 @@ class AgentCoordinator:
                 print(e)
             except CustomError as e:
                 print(e)
-            print(f"Timestep: {self.timestep}")
-
-        self.city_wall_agent.getHull()
+            print(f"--- Timestep: {self.timestep} ---")
             
     
     
