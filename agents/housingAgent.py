@@ -29,24 +29,12 @@ class HousingAgent(StructuralAgent):
                          max_height,
                          max_plots)
         
-        self.max_distance_to_road = 2
-        self.max_slope = max_slope
         self.type = PlotType.HOUSE
 
-        self.min_border_size = 1
-        self.terrain_manipulator = TerrainManipulator(self.blueprint)
-
-
-        self.min_width=min_width
-        self.min_height=min_height
-        self.max_width=max_width
-        self.max_height=max_height
-        self.min_size = self.min_width * self.min_height
 
     def evaluate(self, loc):
-        build_map = self.blueprint.map < 1
-        build_map &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
-        traversable = build_map
+        traversable = self.blueprint.map <= 15
+        traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
         _, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
         if dist == None:
             return -np.inf
@@ -55,4 +43,4 @@ class HousingAgent(StructuralAgent):
             _, dist_to_church = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.church)
             if dist_to_church == None:
                 return -dist
-            return -dist_to_church - dist
+            return -dist_to_church

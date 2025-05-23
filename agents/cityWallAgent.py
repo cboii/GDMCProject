@@ -57,8 +57,8 @@ class CityWallAgent(Agent):
         area = np.array(area)
         hull = ConvexHull(area)
 
-        for i, vertex in enumerate(hull.vertices):
-            self.place([area[vertex]])
+        # for i, vertex in enumerate(hull.vertices):
+        #     self.place([area[vertex]])
 
         self.blueprint.show()
         build_map = self.blueprint.map <= 15
@@ -71,30 +71,36 @@ class CityWallAgent(Agent):
 
         if walls != None and last_segment != None:
             walls.extend(last_segment)
-            wall_coordinates = set([tuple(wall) for wall in walls])
-        
-            for wc in walls:
-                x, y = wc
-                movements = [(0, 1), (0, -1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-
-                for dx, dy in movements:
-                    neighbor_x, neighbor_y = x + dx, y + dy
-                    if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1]:
-                        wall_coordinates.add((neighbor_x, neighbor_y))
-
-            wall_coordinates = list(wall_coordinates)
+            wall_coordinates = self.construct_wall(walls)
             self.place(wall_coordinates)
         else:
             return False
-
-        for l in wall_coordinates:
-            for h in range(10):
-                self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] + h - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
         
         self.set_outside_area()
         
         return True
 
+
+    def construct_wall(self, wall_coords):
+        wall_coordinates = set([tuple(wall) for wall in wall_coords])
+        
+        for wc in wall_coords:
+            x, y = wc
+            movements = [(0, 1), (0, -1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+
+            for dx, dy in movements:
+                neighbor_x, neighbor_y = x + dx, y + dy
+                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1]:
+                    wall_coordinates.add((neighbor_x, neighbor_y))
+
+        return list(wall_coordinates)
+    
+
+    def execute_wall_placement(self):
+        for l in np.argwhere(self.blueprint.city_walls):
+            for h in range(10):
+                self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] + h - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
+    
     def connect_coordinates_in_order(self, coordinates, mask):
         if not coordinates:
             return []

@@ -1,6 +1,10 @@
 import itertools
 import random
 
+import numpy as np
+
+from .bfs import BFS
+
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
 
@@ -31,14 +35,12 @@ class ChurchAgent(StructuralAgent):
                          max_height,
                          max_plots)
         
-        self.max_distance_to_road = 2
-        self.max_slope = max_slope
         self.type = PlotType.CHURCH
 
-        self.min_border_size = 1
-
-        self.min_width=min_width
-        self.min_height=min_height
-        self.max_width=max_width
-        self.max_height=max_height
-        self.min_size = self.min_width * self.min_height
+    def evaluate(self, loc):
+        traversable = self.blueprint.map <= 15
+        traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
+        _, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
+        if dist == None:
+            return -np.inf
+        return len(loc)

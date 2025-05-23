@@ -24,10 +24,9 @@ if __name__ == "__main__":
     mapFeatures = MapFeatureExtractor(editor)
     visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
-
+    visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
+    
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(35, gaussian=gaussian, radius=radius, border_size=border_size)
-
-    visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
+    coordinator.generate(25, gaussian=gaussian, radius=radius, border_size=border_size)
     blueprint.show()

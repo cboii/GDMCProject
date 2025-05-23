@@ -5,7 +5,7 @@ from .roadAgent import RoadConnectorAgent
 from .housingAgent import HousingAgent
 from .churchAgent import ChurchAgent
 from .farmAgent import FarmAgent
-from .StructuralAgent import StructuralAgent
+from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 
 
 class AgentCoordinator:
@@ -63,7 +63,7 @@ class AgentCoordinator:
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
                                         priority=3,
-                                        max_slope=10,
+                                        max_slope=5,
                                         min_width=18, 
                                         min_height=18, 
                                         max_width=25, 
@@ -79,7 +79,38 @@ class AgentCoordinator:
                 self.active_agents.append(agent)
 
 
-    def step(self, execute=True, gaussian=False, radius=1, border_size=3):
+    def expand_search_area(self, expansion):
+        expansion = expansion
+
+        expansion_left = expansion
+        expansion_right = expansion
+        expansion_top = expansion
+        expansion_bottom = expansion
+
+        if (self.min_coords[0] - expansion < 0 and self.min_coords[1] - expansion < 0) and (self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1) and self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1)):
+            print(f"--- Borders reached ---")
+            expansion_top = 0
+            expansion_bottom = 0
+            expansion_left = 0
+            expansion_right = 0
+        
+        if self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1):
+            expansion_top = 0
+        
+        if self.min_coords[1] - expansion < 0:
+            expansion_bottom = 0
+
+        if self.min_coords[0] - expansion < 0:
+            expansion_left = 0
+
+        if self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1):
+            expansion_right = 0
+
+        self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
+        self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
+
+    
+    def step(self, expansion=32, execute=True, gaussian=False, radius=1, border_size=3):
         self.timestep += 1
         self._update_active_agents()
         if len(self.active_agents) == 0:
@@ -93,8 +124,14 @@ class AgentCoordinator:
                 reverse=True
             ):
             try:
-                agent.choose(expansion=32, gaussian=gaussian, radius=radius, border_size=border_size)
+                agent.choose(expansion=32, search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size)
             except IndexError as e:
+                print(e)
+                continue
+            except NoneTypeChoice as e:
+                print(e)
+                continue
+            except NoValidPath as e:
                 print(e)
                 continue
             if agent.current_choice != None:
@@ -112,6 +149,7 @@ class AgentCoordinator:
 
             chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute)
         else:
+            self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")
 
     def generate(self, steps, gaussian=False, radius=1, border_size=3):
@@ -121,6 +159,7 @@ class AgentCoordinator:
             if i >= steps * 1/2 and city_walls_placed == False:
                 success = self.city_wall_agent.try_place()
                 if success:
+                    
                     print("--- City walls placed! ---")
                     city_walls_placed = True
                     continue
@@ -135,8 +174,9 @@ class AgentCoordinator:
                 print(e)
             print(f"--- Timestep: {self.timestep} ---")
             
-    
-    
+        self.city_wall_agent.execute_wall_placement()
+
+        self.blueprint.map_features.editor.flushBuffer() 
     
 class NoneTypeAgent(Exception):
     pass

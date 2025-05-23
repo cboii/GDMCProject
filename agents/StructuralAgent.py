@@ -32,8 +32,6 @@ class StructuralAgent(Agent):
                  outside_walls=False):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
-        self.min_coords = search_area[0]
-        self.max_coords = search_area[1]
         self.activation_step = activation_step
         self.priority = priority
         self.max_slope = max_slope
@@ -102,50 +100,23 @@ class StructuralAgent(Agent):
                 # return rect_mask, border_mask
 
         return matching_locs
-    
-    def choose(self, expansion, gaussian=False, radius=1, border_size=3):
-        expansion = expansion
 
-        expansion_left = expansion
-        expansion_right = expansion
-        expansion_top = expansion
-        expansion_bottom = expansion
 
-        if (self.min_coords[0] - expansion < 0 and self.min_coords[1] - expansion < 0) and (self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1) and self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1)):
-            print(f"Agent of type {self.type.name}: Borders reached")
-            self.current_choice = None
-            return
-        
-        if self.max_coords[1] + expansion > (self.blueprint.map.shape[1] - 1):
-            expansion_top = 0
-        
-        if self.min_coords[1] - expansion < 0:
-            expansion_bottom = 0
-
-        if self.min_coords[0] - expansion < 0:
-            expansion_left = 0
-
-        if self.max_coords[0] + expansion > (self.blueprint.map.shape[0] - 1):
-            expansion_right = 0
-
-        
-        
-        region_size = max([(self.max_coords[0] + expansion_right) - (self.min_coords[0] - expansion_left) + 1, (self.max_coords[1] + expansion_top) - (self.min_coords[1] - expansion_bottom) + 1])
-        print(region_size)
-        height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom), region_size=region_size, gaussian=gaussian, radius=radius)
-        
+    def choose(self, expansion, search_area, gaussian=False, radius=1, border_size=3):
+        region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
+        height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
         buildable_areas = steepness_map <= self.max_slope
         buildable_areas &= ~(ground_water_map != 255)
 
-        build_mask = np.logical_and(buildable_areas, (self.blueprint.map[(self.min_coords[0] - expansion_left): (self.min_coords[0] - expansion_left) + region_size, (self.min_coords[1] - expansion_bottom): (self.min_coords[1] - expansion_bottom) + region_size] == 0))
+        build_mask = np.logical_and(buildable_areas, (self.blueprint.map[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size] == 0))
         build_mask &= ~(self.deactivate_border_region(build_mask, border_size=border_size))
 
         if self.outside_walls and self.blueprint.outside_walls_area.any():
-            print("Outside wall restriction active")
-            build_mask = np.logical_and(build_mask, (self.blueprint.outside_walls_area[(self.min_coords[0] - expansion_left): (self.min_coords[0] - expansion_left) + region_size, (self.min_coords[1] - expansion_bottom): (self.min_coords[1] - expansion_bottom) + region_size]))
+            print(f"--- Wall restriction active for agent of type {self.type.name} ---")
+            build_mask = np.logical_and(build_mask, (self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
         elif (self.outside_walls):
             self.current_choice = None
-            return
+            raise NoneTypeChoice("--- No city walls placed yet ---")
 
         labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
 
@@ -172,10 +143,8 @@ class StructuralAgent(Agent):
             boxes.extend(self.__extract_random_box_and_border(region_mask, self.min_width, self.min_height, self.max_width, self.max_height, border=1))
         
         if len(boxes) == 0:
-            self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
-            self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
             self.current_choice = None
-            return
+            raise NoneTypeChoice("--- No candidates found ---")
         
         max_score = -np.inf
         for b in boxes:
@@ -192,8 +161,8 @@ class StructuralAgent(Agent):
             indices = np.argwhere(area)
             indices_borders = np.argwhere(border_mask)
 
-            offset_coords = indices + np.array([self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom])
-            offset_coords_border = indices_borders + np.array([self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom])
+            offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
+            offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
             
             score = self.evaluate(offset_coords)
             if score > max_score:
@@ -201,16 +170,12 @@ class StructuralAgent(Agent):
                 self.current_choice = [offset_coords, offset_coords_border]
             
         if max_score == -np.inf:
-            self.min_coords = [self.min_coords[0] - expansion_left, self.min_coords[1] - expansion_bottom]
-            self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
             self.current_choice = None
-            return
-            
-        print(f"Max score: {max_score}")
+            raise NoValidPath("--- Cannot connect to road network ---") 
 
     def deactivate_border_region(self, matrix, border_size=3):
         if not isinstance(border_size, int) or border_size < 0:
-            raise ValueError("border_size must be a non-negative integer")
+            raise ValueError("--- border_size must be a non-negative integer ---")
 
         rows, cols = matrix.shape
         mask = np.zeros((rows, cols), dtype=bool)
@@ -229,9 +194,8 @@ class StructuralAgent(Agent):
         return mask
 
     def evaluate(self, loc):
-        build_map = self.blueprint.map < 1
-        build_map &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
-        traversable = build_map
+        traversable = self.blueprint.map <= 15
+        traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
         _, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
         if dist == None:
             return -np.inf
@@ -242,3 +206,10 @@ class StructuralAgent(Agent):
         self.blueprint.place(self.current_choice[1], PlotType.BORDER)
         self.plots_left -= 1
         pass
+
+
+class NoneTypeChoice(Exception):
+    pass
+
+class NoValidPath(Exception):
+    pass
