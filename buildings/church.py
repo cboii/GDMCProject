@@ -21,8 +21,3 @@ def build_church(   editor: Editor, area: Rect, entrance_pos: tuple, entrance_ro
     editor.flushBuffer()
     clean_up_foundation(editor, area, y, exceptions=[])
     editor.flushBuffer()
-
-editor = Editor(buffering=True)
-place_rect_foundation(editor, Rect((0,0), (50, 50)) ,Block("grass_block"))
-area = Rect((0,0), (15, 28))
-build_church(editor, area, (0,0,0), 0, wood_type="spruce")
