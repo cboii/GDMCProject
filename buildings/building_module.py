@@ -45,7 +45,7 @@ class BuildingModule:
 
     def change_wood_type(self, type: str):
         for block in self.blocks.values():
-            block.id = block.id.replace("oak", type)
+            block.id = block.id.replace(":oak", f":{type}")
 
     def randomize_flowers(self):
         for block in self.blocks.values():
@@ -71,7 +71,6 @@ def scan_module(editor: Editor, name: str):
         pickle.dump(module, f)
 
 def get_module_from_pkl(name: str):
-    print(name)
     module_class = name.split('_')[0]
     script_location = Path(__file__).absolute().parent
     file_location = script_location / f"buildingModules/{module_class}/tiles/{name}.pkl"
@@ -90,10 +89,11 @@ def build_module_global(editor: Editor, name: str, start: ivec3, rotation: int, 
     module.place_module_global(editor, start, rotation)
 
 def main():
-    editor = Editor()
-    name = "House_Wood_GF_Corner#0"
+    editor = Editor(buffering=True)
+    name = "Church_Altar#0"
     scan_module(editor, name)
-    build_module_global(editor, name, (-17,-60,-39), 0, "spruce")
+    build_module_global(editor, name, (165, -60, 43), 0, "oak")
+    editor.flushBuffer()
 
 if __name__ == "__main__":
     main()
