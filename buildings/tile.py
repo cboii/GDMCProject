@@ -62,7 +62,7 @@ class Tile:
         if self.entropy == 0 or self.updated:
             return
         
-        print(f"Updating tile {(self.pos.x, self.pos.y, self.pos.z)}")
+        print(f"Updating tile {tuple(self.grid_pos)}")
         possible_modules_neighbors = {}
         for dir, neighbor in self.neighbors.items():
             if (neighbor.updated or neighbor.entropy == 0) and list(neighbor.possible_modules.keys())[0] != ["Air"]:
@@ -93,7 +93,7 @@ class Tile:
                     nb.update(tile_quantity_limits)
 
     def select(self, tile_quantity_limits: dict, tile_weights: dict):
-        print(f"Selecting tile {(self.pos.x, self.pos.y, self.pos.z)}.")
+        print(f"Selecting tile {tuple(self.grid_pos)}.")
         module_list = list(self.possible_modules.keys())
 
         if self.entropy == 1:
