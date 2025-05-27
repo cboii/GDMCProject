@@ -1,25 +1,14 @@
 # Directions: North = 0, East = 1, Bottom = 2, South = 3, West = 4, Top = 5
 # Rotations Facing:  North = 0, East = 1, South = 2, West = 3, Don't Care = 4 
+from tile import create_tile_direction_dict
+from pyglm.glm import ivec3
 
-def create_tile_direction_dict(module_name: str, rot_zero_dict: dict):
-    output = {(module_name, 0): rot_zero_dict}
-    for i in range(1,4):
-        rot_i_dict = {}
-        for j in range(6):
-            if j in [2,5]:
-                rot_i_dict[j] = [(name,(rot+i)%4) for name,rot in rot_zero_dict[j]]
-            else:
-                direction_list = [0,1,3,4]
-                direction = direction_list.index(j)
-                new_direction = (direction+i)%4
-                dict_key = direction_list[new_direction]
+TILE_SIZE = ivec3(3,4,3)
 
-                rot_i_dict[dict_key] = [(name, 4) if rot == 4 else (name,(rot+i)%4) for name,rot in rot_zero_dict[j]]
-
-        output.update({(module_name,i): dict(sorted(rot_i_dict.items()))})
-    return output
-            
-
+tile_quantity_limits = {("House_Wood_GF_Corner",0): 1,
+                        ("House_Wood_GF_Corner",1): 1,
+                        ("House_Wood_GF_Corner",2): 1,
+                        ("House_Wood_GF_Corner",3): 1}
 
 tile_directions_zero = {    "House_Wood_Ceiling":           {   0: [("House_Wood_GF_Wall",0),("House_Wood_GF_Window",0), ("House_Wood_UF_Wall",0),("House_Wood_UF_Window",0), ("House_Wood_Ceiling",4), ("House_Wood_Stairs",0)],
                                                                 1: [("House_Wood_GF_Wall",1),("House_Wood_GF_Window",1), ("House_Wood_UF_Wall",1),("House_Wood_UF_Window",1), ("House_Wood_Ceiling",4), ("House_Wood_Stairs",0)],

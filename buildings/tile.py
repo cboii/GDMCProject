@@ -3,7 +3,7 @@ from pyglm.glm import ivec3
 from gdpc import Editor
 from building_module import *
 
-TILE_SIZE = ivec3(3,4,3)
+
 
 NORTH = 0
 EAST = 1
@@ -11,6 +11,24 @@ TOP = 2
 SOUTH = 3
 WEST = 4
 BOTTOM = 5
+
+def create_tile_direction_dict(module_name: str, rot_zero_dict: dict):
+    output = {(module_name, 0): rot_zero_dict}
+    for i in range(1,4):
+        rot_i_dict = {}
+        for j in range(6):
+            if j in [2,5]:
+                rot_i_dict[j] = [(name,(rot+i)%4) for name,rot in rot_zero_dict[j]]
+            else:
+                direction_list = [0,1,3,4]
+                direction = direction_list.index(j)
+                new_direction = (direction+i)%4
+                dict_key = direction_list[new_direction]
+
+                rot_i_dict[dict_key] = [(name, 4) if rot == 4 else (name,(rot+i)%4) for name,rot in rot_zero_dict[j]]
+
+        output.update({(module_name,i): dict(sorted(rot_i_dict.items()))})
+    return output
 
 class Tile:
     
@@ -40,11 +58,11 @@ class Tile:
     def get_neighbors(self):
         return self.neighbors
     
-    def update(self):
-        print(f"Updating tile {self.grid_pos}. Entropy {self.entropy}. Possible Modules {list(self.possible_modules.keys())}.")
+    def update(self, tile_quantity_limits: dict):
         if self.entropy == 0 or self.updated:
             return
         
+        print(f"Updating tile {(self.pos.x, self.pos.y, self.pos.z)}")
         possible_modules_neighbors = {}
         for dir, neighbor in self.neighbors.items():
             if (neighbor.updated or neighbor.entropy == 0) and list(neighbor.possible_modules.keys())[0] != ["Air"]:
@@ -52,32 +70,30 @@ class Tile:
 
         possible_for_tile_per_neighbor = []
         for dir, p_modules in possible_modules_neighbors.items():
-            print(dir)
             possible_for_tile_in_neighbor = set()
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])
             possible_for_tile_per_neighbor.append(list(possible_for_tile_in_neighbor))
-        print(possible_for_tile_per_neighbor)
 
         possible_for_tile = set(possible_for_tile_per_neighbor[0]).intersection(*possible_for_tile_per_neighbor)
         
-        print(possible_for_tile)
 
         previously_possible = self.possible_modules
         still_possible = {}
         for tile in previously_possible.keys():
             if tile in possible_for_tile:
-                still_possible[tile] = previously_possible[tile]
+                if tile not in tile_quantity_limits.keys() or tile_quantity_limits[tile] > 0:
+                    still_possible[tile] = previously_possible[tile]
 
         self.possible_modules = still_possible
         self.entropy = len(self.possible_modules)
-        print(f"After Update possible modules {list(self.possible_modules.keys())}")
         self.updated = True
         if len(previously_possible)-len(still_possible) > 0:
             for nb in self.neighbors.values():
-                    nb.update()
+                    nb.update(tile_quantity_limits)
 
-    def select(self, tile_weights: dict):
+    def select(self, tile_quantity_limits: dict, tile_weights: dict):
+        print(f"Selecting tile {(self.pos.x, self.pos.y, self.pos.z)}.")
         module_list = list(self.possible_modules.keys())
 
         if self.entropy == 1:
@@ -89,13 +105,14 @@ class Tile:
         else:
             print("Entropy = 0")
         print(f"Selected Module {self.selected_module}")
+        if self.selected_module in tile_quantity_limits.keys(): 
+            tile_quantity_limits[self.selected_module] -= 1
         self.entropy = 0
         for dir, nb in self.neighbors.items():
-            nb.update()
+            nb.update(tile_quantity_limits)
 
     def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak"):
         module, rotation = self.selected_module
-        print(f"Module: {module}, Variation weight keys: {variation_weights.keys()}")
         if module in variation_weights.keys():
             if rotation == 4:
                 rotation = random.randint(0,3)
