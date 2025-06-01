@@ -6,15 +6,11 @@ from  maps.blueprint import Blueprint
 
 class BFS:
     @staticmethod
-    def find_minimal_path_to_network(traversable, rect_coords, 
+    def find_minimal_path_to_network_boolean(traversable, rect_coords, 
                            network: np.ndarray,
                            connectivity: int = 8) -> np.ndarray:
-        if connectivity not in (4, 8):
-            raise CustomError("connectivity must be 4 or 8")
-        if network.ndim != 2 or traversable.ndim != 2:
-            raise CustomError("network and traversable must be 2D arrays")
-        if network.shape != traversable.shape:
-            raise CustomError("network and traversable must have the same shape")
+        if connectivity not in [4, 8]:
+            raise ValueError("Connectivity must be 4 or 8.")
 
         h, w = network.shape
 
@@ -79,9 +75,9 @@ class BFS:
                 cur = prev[cur]
                 path_mask[cur] = True
         else:
-            return None, None
+            return None
 
-        return np.argwhere(path_mask), len(np.argwhere(path_mask))
+        return np.argwhere(path_mask)
     
     @staticmethod
     def is_valid(mask, r, c):
@@ -116,8 +112,59 @@ class BFS:
                 neighbor_r, neighbor_c = r + dr[i], c + dc[i]
                 neighbor_node = (neighbor_r, neighbor_c)
 
+                if neighbor_node in visited:
+                    continue
+
                 if BFS.is_valid(mask, neighbor_r, neighbor_c) and neighbor_node not in visited:
                     visited.add(neighbor_node)
                     queue.append((neighbor_node, current_path + [neighbor_node]))
 
         return None
+    
+    @staticmethod
+    def find_minimal_path_to_network_numeric(mask, start, end, connectivity=8):
+        if connectivity not in [4, 8]:
+            raise ValueError("Connectivity must be 4 or 8.")
+
+        rows, cols = mask.shape
+        queue = deque()
+        visited = set()
+        paths = []
+        values = []
+        for coord in start:
+            x_cord = int(coord[0])
+            y_cord = int(coord[1])
+            coord = (x_cord, y_cord)
+            queue.append((coord, [coord], 0))
+            visited.add(coord)
+
+        if connectivity == 4:
+            dr = [-1, 1, 0, 0]
+            dc = [0, 0, -1, 1]
+        else:
+            dr = [-1, -1, -1, 0, 0, 1, 1, 1]
+            dc = [-1, 0, 1, -1, 1, -1, 0, 1]
+
+        while queue:
+            current_node, current_path, value = queue.popleft()
+
+            r, c = current_node
+
+            for i in range(len(dr)):
+                neighbor_r, neighbor_c = r + dr[i], c + dc[i]
+                neighbor_node = (neighbor_r, neighbor_c)
+                if neighbor_node in visited:
+                    continue
+                if neighbor_node not in visited and 0 <= neighbor_r < rows and 0 <= neighbor_c < cols and neighbor_node not in end and mask[neighbor_node] <= 1000:
+                    visited.add(neighbor_node)
+                    queue.append((neighbor_node, current_path + [neighbor_node], value + mask[neighbor_node]))
+                if neighbor_node in end and 0 <= neighbor_r < rows and 0 <= neighbor_c < cols:
+                    visited.add(neighbor_node)
+                    paths.append(current_path + [neighbor_node])
+                    values.append(value + mask[neighbor_node])
+
+        try:
+            min_value_path_index = np.argmin(values)
+        except Exception:
+            return None
+        return paths[min_value_path_index]

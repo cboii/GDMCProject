@@ -11,10 +11,10 @@ class MapFeatureExtractor:
         self.world_slice = editor.loadWorldSlice()
     
     def _get_dimensions(self, first: Vec3iLike , last: Vec3iLike):
-        if first == None:
+        if first is None:
             first = (0,0,0)
         
-        if last == None: 
+        if last is None: 
             last = self.build_area.end-self.build_area.offset
         
         length = last[0] - first[0]

@@ -1,6 +1,3 @@
-from collections import deque
-
-from matplotlib import pyplot as plt
 from gdpc import Block
 from scipy.spatial import ConvexHull
 
@@ -44,6 +41,11 @@ class CityWallAgent(Agent):
         
         self.max_plots = max_plots
 
+    def penalty(self, x):
+        if x:
+            return 10000
+        return 0
+
     def try_place(self):
         house_coordinates = np.argwhere(self.blueprint.map)
         area = []
@@ -61,13 +63,13 @@ class CityWallAgent(Agent):
         #     self.place([area[vertex]])
 
         self.blueprint.show()
-        build_map = self.blueprint.map <= 15
-        build_map &= self.blueprint.steepness_map <= self.max_slope
-        build_map &= ~(self.blueprint.ground_water_map != 255)
-        traversable = build_map
 
-        walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], traversable)
-        last_segment = self.connect_coordinates_in_order([tuple(area[hull.vertices[-1]]), tuple(area[hull.vertices[0]])], traversable)
+        f = np.vectorize(self.penalty)
+        n_build_map = self.blueprint.steepness_map + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
+        n_traversable = n_build_map
+
+        walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
+        last_segment = self.connect_coordinates_in_order([tuple(area[hull.vertices[-1]]), tuple(area[hull.vertices[0]])], n_traversable)
 
         if walls != None and last_segment != None:
             walls.extend(last_segment)
@@ -90,7 +92,7 @@ class CityWallAgent(Agent):
 
             for dx, dy in movements:
                 neighbor_x, neighbor_y = x + dx, y + dy
-                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1]:
+                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <= 1:
                     wall_coordinates.add((neighbor_x, neighbor_y))
 
         return list(wall_coordinates)
@@ -101,7 +103,7 @@ class CityWallAgent(Agent):
             for h in range(10):
                 self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] + h - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
     
-    def connect_coordinates_in_order(self, coordinates, mask):
+    def connect_coordinates_in_order(self, coordinates, n_mask: np.ndarray):
         if not coordinates:
             return []
 
@@ -111,8 +113,7 @@ class CityWallAgent(Agent):
             start_node = coordinates[i]
             end_node = coordinates[i+1]
 
-            path_segment = BFS.find_minimal_path_to_point(mask, start_node, end_node)
-
+            path_segment = BFS.find_minimal_path_to_network_numeric(n_mask, [start_node], [end_node])
             if path_segment is None:
                 print(f"No path found between {start_node} and {end_node}")
                 return None

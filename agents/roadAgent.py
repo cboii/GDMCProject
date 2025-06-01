@@ -5,9 +5,7 @@ from .bfs import BFS
 from terrain.terrain_manipulator import TerrainManipulator
 from .agentClass import Agent
 from .plots import PlotType
-import random
 import numpy as np
-from collections import deque
 
 class RoadExtendorAgent(Agent):
 
@@ -35,12 +33,16 @@ class RoadConnectorAgent(Agent):
 
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
 
-    def connect_to_road_network(self, loc, execute = False):
-        build_map = self.blueprint.map <= 15
-        build_map &= self.blueprint.steepness_map <= self.max_slope
-        traversable = build_map
-        path, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
-        if dist == None:
+    def penalty(self, x):
+        if x:
+            return 10000
+        return 0
+
+    def connect_to_road_network(self, loc, execute = False, border_size=3):
+        penalty = np.vectorize(self.penalty)
+        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map > 15).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
+        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
+        if path is None:
             raise CustomError("No optimal path found!")
         path = self.construct_road(path)
         self.place(path)
@@ -49,8 +51,28 @@ class RoadConnectorAgent(Agent):
             self.terrain_manipulator.place_road_segment(path)
         pass
 
+    def deactivate_border_region(self, matrix, border_size=3):
+        if not isinstance(border_size, int) or border_size < 0:
+            raise ValueError("--- border_size must be a non-negative integer ---")
+
+        rows, cols = matrix.shape
+        mask = np.zeros((rows, cols), dtype=bool)
+
+        effective_border_size = min(border_size, (rows + 1) // 2, (cols + 1) // 2)
+
+        if effective_border_size == 0:
+            return mask
+
+
+        mask[:effective_border_size, :] = True
+        mask[rows - effective_border_size:, :] = True
+        mask[:, :effective_border_size] = True
+        mask[:, cols - effective_border_size:] = True
+        
+        return mask
+
     def construct_road(self, road_coords):
-        road_coordinates = set([tuple(wall) for wall in road_coords])
+        road_coordinates = set(road_coords)
         
         for wc in road_coords:
             x, y = wc

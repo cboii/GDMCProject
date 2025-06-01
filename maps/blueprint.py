@@ -8,21 +8,22 @@ from scipy.ndimage import gaussian_filter
 class Blueprint:
     def __init__(self, map_features: MapFeatureExtractor = None):
         
-        
-        self.map: np.ndarray = np.zeros((256,256))
-        self.current_area: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.road_network: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.houses: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.borders: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.farms: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.church: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.well: np.ndarray = np.zeros((256,256), dtype=bool)
-        self.city_walls: np.ndarray = np.zeros((256,256), dtype=bool)
         self.map_features = map_features
-        self.outside_walls_area = np.zeros((256,256), dtype=bool)
         self.ground_water_map = self.map_features.create_groundwater_map()
         self.steepness_map = self.map_features.create_gradient_maps()[4]
         self.height_map = self.map_features.create_heightmap()
+
+        self.map: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]))
+        self.current_area: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.road_network: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.houses: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.borders: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.farms: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.church: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.well: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.city_walls: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.town_hall: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.outside_walls_area = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
 
     def place(self, loc: np.ndarray, type: PlotType):
         for x, y in loc:
@@ -42,6 +43,9 @@ class Blueprint:
                 case PlotType.WELL:
                     self.map[x, y] = 100
                     self.well[x,y] = True
+                case PlotType.TOWNHALL:
+                    self.map[x,y]=175
+                    self.town_hall[x,y] = True
                 case PlotType.CHURCH:
                     self.map[x,y]=50
                     self.church[x,y] = True

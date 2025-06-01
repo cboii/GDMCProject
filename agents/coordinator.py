@@ -1,4 +1,5 @@
 from Error import CustomError
+from .townHallAgent import TownHallAgent
 from .cityWallAgent import CityWallAgent
 from maps.blueprint import Blueprint
 from .roadAgent import RoadConnectorAgent
@@ -37,6 +38,18 @@ class AgentCoordinator:
                                           max_height=15,
                                           max_plots=100)
         
+        self.town_hall_agent = TownHallAgent(blueprint=blueprint, 
+                                          search_area=[self.min_coords, self.max_coords], 
+                                          road_connector_agent=self.road_connector_agent, 
+                                          activation_step=0,
+                                          priority=2,
+                                          max_slope=3,
+                                          min_width=17, 
+                                          min_height=17, 
+                                          max_width=25, 
+                                          max_height=25,
+                                          max_plots=1)
+        
         self.farm_agent = FarmAgent(blueprint=blueprint, 
                                     search_area=[self.min_coords, self.max_coords], 
                                     road_connector_agent=self.road_connector_agent,
@@ -52,9 +65,9 @@ class AgentCoordinator:
         self.church_agent = ChurchAgent(blueprint=blueprint, 
                                         search_area=[self.min_coords, self.max_coords], 
                                         road_connector_agent=self.road_connector_agent,
-                                        activation_step=5,
+                                        activation_step=0,
                                         priority=2,
-                                        max_slope=2,
+                                        max_slope=3,
                                         min_width=18, 
                                         min_height=18, 
                                         max_width=25, 
@@ -74,7 +87,7 @@ class AgentCoordinator:
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        for agent in [self.housing_agent, self.farm_agent, self.church_agent]:
+        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent]:
             if agent.activation_step <= self.timestep and agent.plots_left != 0:
                 self.active_agents.append(agent)
 
@@ -124,7 +137,7 @@ class AgentCoordinator:
                 reverse=True
             ):
             try:
-                agent.choose(expansion=32, search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size)
+                agent.choose(search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size)
             except IndexError as e:
                 print(e)
                 continue
@@ -147,7 +160,7 @@ class AgentCoordinator:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
 
-            chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute)
+            chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute, border_size=border_size)
         else:
             self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")

@@ -9,3 +9,4 @@ class PlotType(Enum):
     BORDER = 5
     CHURCH = 6
     CITYWALL = 7
+    TOWNHALL = 8

@@ -1,9 +1,6 @@
-from collections import deque
 import random
-from matplotlib import pyplot as plt
 import numpy as np
 
-from Error import CustomError
 from .bfs import BFS
 
 from .plots import PlotType
@@ -48,6 +45,11 @@ class StructuralAgent(Agent):
         self.plots_left = max_plots
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
+
+    def penalty(self, x):
+        if x:
+            return 10000
+        return 0
 
     @staticmethod
     def __extract_random_box_and_border(region_mask: np.ndarray,
@@ -102,7 +104,7 @@ class StructuralAgent(Agent):
         return matching_locs
 
 
-    def choose(self, expansion, search_area, gaussian=False, radius=1, border_size=3):
+    def choose(self, search_area, gaussian=False, radius=1, border_size=3):
         region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
         height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
         buildable_areas = steepness_map <= self.max_slope
@@ -194,12 +196,12 @@ class StructuralAgent(Agent):
         return mask
 
     def evaluate(self, loc):
-        traversable = self.blueprint.map <= 15
-        traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
-        _, dist = BFS.find_minimal_path_to_network(traversable, loc, self.blueprint.road_network)
-        if dist == None:
+        penalty = np.vectorize(self.penalty)
+        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int)
+        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
+        if path is None:
             return -np.inf
-        return -dist
+        return len(loc)
 
     def place(self):
         super().place(self.current_choice[0])

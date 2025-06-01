@@ -6,7 +6,7 @@ from .StructuralAgent import StructuralAgent
 from .plots import PlotType
 
 
-class ChurchAgent(StructuralAgent):
+class TownHallAgent(StructuralAgent):
 
     def __init__(self, 
                  blueprint, 
@@ -32,7 +32,12 @@ class ChurchAgent(StructuralAgent):
                          max_height,
                          max_plots)
         
-        self.type = PlotType.CHURCH
+        self.type = PlotType.TOWNHALL
+
+    def penalty(self, x):
+        if x:
+            return 10000
+        return 0
 
     def evaluate(self, loc):
         f = np.vectorize(self.penalty)
