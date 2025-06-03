@@ -34,10 +34,10 @@ class ChurchAgent(StructuralAgent):
         
         self.type = PlotType.CHURCH
 
-    def evaluate(self, loc):
-        f = np.vectorize(self.penalty)
-        traversable_n = self.blueprint.steepness_map + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
+    def evaluate(self, loc, border_size=3):
+        penalty = np.vectorize(self.penalty)
+        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(loc)
+        return len(loc), path

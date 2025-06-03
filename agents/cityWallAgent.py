@@ -62,7 +62,7 @@ class CityWallAgent(Agent):
         # for i, vertex in enumerate(hull.vertices):
         #     self.place([area[vertex]])
 
-        self.blueprint.show()
+        # self.blueprint.show()
 
         f = np.vectorize(self.penalty)
         n_build_map = self.blueprint.steepness_map + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)

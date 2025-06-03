@@ -33,6 +33,7 @@ class StructuralAgent(Agent):
         self.priority = priority
         self.max_slope = max_slope
         self.current_choice = None
+        self.current_path = None
 
         self.outside_walls = outside_walls
 
@@ -118,6 +119,7 @@ class StructuralAgent(Agent):
             build_mask = np.logical_and(build_mask, (self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
         elif (self.outside_walls):
             self.current_choice = None
+            self.current_path = None
             raise NoneTypeChoice("--- No city walls placed yet ---")
 
         labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
@@ -146,6 +148,7 @@ class StructuralAgent(Agent):
         
         if len(boxes) == 0:
             self.current_choice = None
+            self.current_path = None
             raise NoneTypeChoice("--- No candidates found ---")
         
         max_score = -np.inf
@@ -166,13 +169,15 @@ class StructuralAgent(Agent):
             offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
             offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
             
-            score = self.evaluate(offset_coords)
+            score, path = self.evaluate(offset_coords, border_size=border_size)
             if score > max_score:
                 max_score = score
                 self.current_choice = [offset_coords, offset_coords_border]
+                self.current_path = path
             
         if max_score == -np.inf:
             self.current_choice = None
+            self.current_path = None
             raise NoValidPath("--- Cannot connect to road network ---") 
 
     def deactivate_border_region(self, matrix, border_size=3):
@@ -195,13 +200,13 @@ class StructuralAgent(Agent):
         
         return mask
 
-    def evaluate(self, loc):
+    def evaluate(self, loc, border_size=3):
         penalty = np.vectorize(self.penalty)
-        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int)
+        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(loc)
+        return len(loc), path
 
     def place(self):
         super().place(self.current_choice[0])

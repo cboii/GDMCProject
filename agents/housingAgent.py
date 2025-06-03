@@ -31,13 +31,13 @@ class HousingAgent(StructuralAgent):
         
         self.type = PlotType.HOUSE
 
-    def evaluate(self, loc):
+    def evaluate(self, loc, border_size=3):
         traversable = self.blueprint.map <= 15
         traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
         path = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.road_network)
         if path is None:
-            f = np.vectorize(self.penalty)
-            traversable_n = self.blueprint.steepness_map + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
+            penalty = np.vectorize(self.penalty)
+            traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
             path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
             if path is None:
                 return -np.inf
@@ -45,5 +45,5 @@ class HousingAgent(StructuralAgent):
         traversable = np.ones((self.blueprint.map.shape[0], self.blueprint.map.shape[1]), dtype=bool)
         path_to_church = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.church)
         if path_to_church is None:
-            return - len(path)
-        return -len(path_to_church)
+            return - len(path), path
+        return -len(path_to_church), path

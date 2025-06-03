@@ -1,4 +1,5 @@
 from collections import deque
+import heapq
 import numpy as np
 from Error import CustomError
 from  maps.blueprint import Blueprint
@@ -127,7 +128,7 @@ class BFS:
             raise ValueError("Connectivity must be 4 or 8.")
 
         rows, cols = mask.shape
-        queue = deque()
+        queue = []
         visited = set()
         paths = []
         values = []
@@ -135,7 +136,7 @@ class BFS:
             x_cord = int(coord[0])
             y_cord = int(coord[1])
             coord = (x_cord, y_cord)
-            queue.append((coord, [coord], 0))
+            heapq.heappush(queue, (0, (coord, [coord])))
             visited.add(coord)
 
         if connectivity == 4:
@@ -145,9 +146,9 @@ class BFS:
             dr = [-1, -1, -1, 0, 0, 1, 1, 1]
             dc = [-1, 0, 1, -1, 1, -1, 0, 1]
 
-        while queue:
-            current_node, current_path, value = queue.popleft()
-
+        terminate = False
+        while queue and not terminate:
+            value, (current_node, current_path) = heapq.heappop(queue)
             r, c = current_node
 
             for i in range(len(dr)):
@@ -155,13 +156,15 @@ class BFS:
                 neighbor_node = (neighbor_r, neighbor_c)
                 if neighbor_node in visited:
                     continue
-                if neighbor_node not in visited and 0 <= neighbor_r < rows and 0 <= neighbor_c < cols and neighbor_node not in end and mask[neighbor_node] <= 1000:
+                elif 0 <= neighbor_r < rows and 0 <= neighbor_c < cols and neighbor_node not in end and mask[neighbor_node] <= 1000:
                     visited.add(neighbor_node)
-                    queue.append((neighbor_node, current_path + [neighbor_node], value + mask[neighbor_node]))
-                if neighbor_node in end and 0 <= neighbor_r < rows and 0 <= neighbor_c < cols:
+                    heapq.heappush(queue, (value + mask[neighbor_node], (neighbor_node, current_path + [neighbor_node])))
+                elif neighbor_node in end and 0 <= neighbor_r < rows and 0 <= neighbor_c < cols:
                     visited.add(neighbor_node)
                     paths.append(current_path + [neighbor_node])
                     values.append(value + mask[neighbor_node])
+                    terminate = True
+
 
         try:
             min_value_path_index = np.argmin(values)

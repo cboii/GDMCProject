@@ -43,7 +43,7 @@ class AgentCoordinator:
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
                                           priority=2,
-                                          max_slope=3,
+                                          max_slope=2,
                                           min_width=17, 
                                           min_height=17, 
                                           max_width=25, 
@@ -55,7 +55,7 @@ class AgentCoordinator:
                                     road_connector_agent=self.road_connector_agent,
                                     activation_step=8,
                                     priority=1,
-                                    max_slope=3,
+                                    max_slope=2,
                                     min_width=20, 
                                     min_height=20, 
                                     max_width=30, 
@@ -67,7 +67,7 @@ class AgentCoordinator:
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
                                         priority=2,
-                                        max_slope=3,
+                                        max_slope=2,
                                         min_width=18, 
                                         min_height=18, 
                                         max_width=25, 
@@ -160,7 +160,7 @@ class AgentCoordinator:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
 
-            chosen_agent.road_connector_agent.connect_to_road_network(chosen_agent.current_choice[1], execute, border_size=border_size)
+            chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
         else:
             self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")
