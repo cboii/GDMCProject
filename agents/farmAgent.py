@@ -7,8 +7,7 @@ from .plots import PlotType
 class FarmAgent(StructuralAgent):
 
     def __init__(self, 
-                 blueprint, 
-                 search_area, 
+                 blueprint,
                  road_connector_agent, 
                  activation_step, priority, 
                  max_slope,
@@ -17,9 +16,10 @@ class FarmAgent(StructuralAgent):
                  max_width, 
                  max_height,
                  max_plots,
-                 outside_walls):
+                 outside_walls,
+                 border=1,
+                 sizes=[]):
         super().__init__(blueprint, 
-                         search_area, 
                          road_connector_agent, 
                          activation_step, 
                          priority, 
@@ -29,7 +29,9 @@ class FarmAgent(StructuralAgent):
                          max_width, 
                          max_height,
                          max_plots,
-                         outside_walls)
+                         outside_walls,
+                         border,
+                         sizes)
         self.type = PlotType.FARM
 
     def evaluate(self, loc, border_size=3):
@@ -38,8 +40,7 @@ class FarmAgent(StructuralAgent):
         traversable = build_map
         path = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.road_network)
         if path is None:
-            penalty = np.vectorize(self.penalty)
-            traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
+            traversable_n = self.blueprint.get_traversable_map(border_size)
             path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
             if path is None:
                 return -np.inf

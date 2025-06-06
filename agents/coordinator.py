@@ -27,7 +27,6 @@ class AgentCoordinator:
                                                        max_slope=1)
 
         self.housing_agent = HousingAgent(blueprint=blueprint, 
-                                          search_area=[self.min_coords, self.max_coords], 
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
                                           priority=0,
@@ -36,10 +35,17 @@ class AgentCoordinator:
                                           min_height=11, 
                                           max_width=15, 
                                           max_height=15,
-                                          max_plots=100)
+                                          max_plots=100,
+                                          outside_walls=False,
+                                          border=1,
+                                          sizes = list(set([(h, w)
+                                            for h in range(11, 20 + 1)
+                                            for w in range(14,  23 + 1)]) | 
+                                            set([(h, w)
+                                            for h in range(14,  23 + 1)
+                                            for w in range(11, 20 + 1)])))
         
         self.town_hall_agent = TownHallAgent(blueprint=blueprint, 
-                                          search_area=[self.min_coords, self.max_coords], 
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
                                           priority=2,
@@ -48,10 +54,12 @@ class AgentCoordinator:
                                           min_height=17, 
                                           max_width=25, 
                                           max_height=25,
-                                          max_plots=1)
+                                          max_plots=1,
+                                          outside_walls=False,
+                                          border=1,
+                                          sizes = [(22, 21), (28, 22), (21, 22), (22, 28)])
         
-        self.farm_agent = FarmAgent(blueprint=blueprint, 
-                                    search_area=[self.min_coords, self.max_coords], 
+        self.farm_agent = FarmAgent(blueprint=blueprint,  
                                     road_connector_agent=self.road_connector_agent,
                                     activation_step=8,
                                     priority=1,
@@ -61,18 +69,24 @@ class AgentCoordinator:
                                     max_width=30, 
                                     max_height=30,
                                     max_plots=5,
-                                    outside_walls=True)
-        self.church_agent = ChurchAgent(blueprint=blueprint, 
-                                        search_area=[self.min_coords, self.max_coords], 
+                                    outside_walls=True,
+                                    border=1,
+                                    sizes= [(h, w)
+                                            for h in range(17, 26 + 1)
+                                            for w in range(17,  26 + 1)])
+        self.church_agent = ChurchAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
                                         priority=2,
                                         max_slope=2,
-                                        min_width=18, 
+                                        min_width=13,
                                         min_height=18, 
                                         max_width=25, 
                                         max_height=25,
-                                        max_plots=1)
+                                        max_plots=1,
+                                        outside_walls=False,
+                                        border=1,
+                                        sizes=[(21, 13), (28, 13), (13, 21), (13, 28)])
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
                                         priority=3,

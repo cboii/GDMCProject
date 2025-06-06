@@ -16,8 +16,7 @@ from scipy.signal import convolve2d
 
 class StructuralAgent(Agent):
     def __init__(self, 
-                 blueprint, 
-                 search_area, 
+                 blueprint,
                  road_connector_agent: RoadConnectorAgent, 
                  activation_step, priority, 
                  max_slope, 
@@ -26,7 +25,9 @@ class StructuralAgent(Agent):
                  max_width, 
                  max_height,
                  max_plots,
-                 outside_walls=False):
+                 outside_walls=False,
+                 border=1,
+                 sizes=[]):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
@@ -34,44 +35,33 @@ class StructuralAgent(Agent):
         self.max_slope = max_slope
         self.current_choice = None
         self.current_path = None
+        self.border_size = border
 
         self.outside_walls = outside_walls
 
-        self.min_width=min_width
-        self.min_height=min_height
-        self.max_width=max_width
-        self.max_height=max_height
-        self.min_size = self.min_width * self.min_height
-
+        self.sizes = sizes
+        self.min_size = np.min([h + 2*border for h,w in sizes]) * np.min([w + 2*border for h,w in sizes])
+        print(self.min_size)
         self.plots_left = max_plots
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
+        # print(self.sizes)
 
-    def penalty(self, x):
-        if x:
-            return 10000
-        return 0
-
-    @staticmethod
-    def __extract_random_box_and_border(region_mask: np.ndarray,
-                                            min_width: int,
-                                            min_height: int,
-                                            max_width: int,
-                                            max_height: int,
+    def __extract_random_box_and_border(self, region_mask: np.ndarray,
                                             border: int = 1
                                            ) -> tuple[np.ndarray, np.ndarray] | None:
         
         mask_int = region_mask.astype(np.int32)
         rows, cols = mask_int.shape
 
-        sizes = [(h, w)
-                 for h in range(min_height, max_height + 1)
-                 for w in range(min_width,  max_width + 1)]
+        sizes = [(h + 2 * self.border_size, w + 2 * self.border_size) for h,w in self.sizes]
+        # sizes = [(h, w)
+        #          for h in range(min_height, max_height + 1)
+        #          for w in range(min_width,  max_width + 1)]
         random.shuffle(sizes)
 
         matching_locs = []
         for h, w in sizes:
-            
             if h > rows or w > cols:
                 continue
 
@@ -144,7 +134,7 @@ class StructuralAgent(Agent):
             region_mask = (labeled_array == label_id)
             region_size = np.sum(region_mask)
 
-            boxes.extend(self.__extract_random_box_and_border(region_mask, self.min_width, self.min_height, self.max_width, self.max_height, border=1))
+            boxes.extend(self.__extract_random_box_and_border(region_mask, border=1))
         
         if len(boxes) == 0:
             self.current_choice = None
@@ -169,7 +159,13 @@ class StructuralAgent(Agent):
             offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
             offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
             
-            score, path = self.evaluate(offset_coords, border_size=border_size)
+            res = self.evaluate(offset_coords, border_size=border_size)
+            if type(res) == float:
+                self.current_choice = None
+                self.current_path = None
+                raise NoValidPath("--- Cannot connect to road network ---")
+             
+            score, path = res
             if score > max_score:
                 max_score = score
                 self.current_choice = [offset_coords, offset_coords_border]
@@ -201,8 +197,7 @@ class StructuralAgent(Agent):
         return mask
 
     def evaluate(self, loc, border_size=3):
-        penalty = np.vectorize(self.penalty)
-        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
+        traversable_n = self.blueprint.get_traversable_map(border_size)
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf

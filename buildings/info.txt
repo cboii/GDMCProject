@@ -1,0 +1,21 @@
+Church:
+  Width: 13
+  Length: 21 or 28
+  Module size W: 13 L:7
+ 
+Town Hall:
+  Width: 22
+  Length: 21 or 28
+  Module size W:11 L:7
+
+House:
+  Width: min 11 max 20
+  Length: min 14 max 23
+  Module size W:3 L:3
+  (+2 plot width + length for roof)  
+
+Farm:
+  Width: min 17 max 26
+  Length: min 17 max 26
+  Module size W:3 L:3
+  (+2 plot width + length for roof)

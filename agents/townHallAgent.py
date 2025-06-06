@@ -9,8 +9,7 @@ from .plots import PlotType
 class TownHallAgent(StructuralAgent):
 
     def __init__(self, 
-                 blueprint, 
-                 search_area, 
+                 blueprint,
                  road_connector_agent, 
                  activation_step, 
                  priority, 
@@ -19,9 +18,11 @@ class TownHallAgent(StructuralAgent):
                  min_height, 
                  max_width, 
                  max_height,
-                 max_plots):
-        super().__init__(blueprint, 
-                         search_area, 
+                 max_plots,
+                 outside_walls,
+                 border=1,
+                 sizes=[]):
+        super().__init__(blueprint,
                          road_connector_agent, 
                          activation_step, 
                          priority, 
@@ -30,7 +31,10 @@ class TownHallAgent(StructuralAgent):
                          min_height, 
                          max_width, 
                          max_height,
-                         max_plots)
+                         max_plots,
+                         outside_walls,
+                         border,
+                         sizes)
         
         self.type = PlotType.TOWNHALL
 

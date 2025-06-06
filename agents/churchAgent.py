@@ -9,8 +9,7 @@ from .plots import PlotType
 class ChurchAgent(StructuralAgent):
 
     def __init__(self, 
-                 blueprint, 
-                 search_area, 
+                 blueprint,
                  road_connector_agent, 
                  activation_step, 
                  priority, 
@@ -19,9 +18,11 @@ class ChurchAgent(StructuralAgent):
                  min_height, 
                  max_width, 
                  max_height,
-                 max_plots):
-        super().__init__(blueprint, 
-                         search_area, 
+                 max_plots,
+                 outside_walls,
+                 border=1,
+                 sizes=[]):
+        super().__init__(blueprint,
                          road_connector_agent, 
                          activation_step, 
                          priority, 
@@ -30,13 +31,15 @@ class ChurchAgent(StructuralAgent):
                          min_height, 
                          max_width, 
                          max_height,
-                         max_plots)
+                         max_plots,
+                         outside_walls,
+                         border,
+                         sizes)
         
         self.type = PlotType.CHURCH
 
     def evaluate(self, loc, border_size=3):
-        penalty = np.vectorize(self.penalty)
-        traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
+        traversable_n = self.blueprint.get_traversable_map(border_size)
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf

@@ -59,7 +59,37 @@ class Blueprint:
         plt.imshow(np.rot90(self.map), interpolation='nearest', origin='lower')
         plt.show()
 
+    def penalty(self, x):
+        if x:
+            return 10000
+        return 0
 
+    def deactivate_border_region(self, matrix, border_size=3):
+        if not isinstance(border_size, int) or border_size < 0:
+            raise ValueError("--- border_size must be a non-negative integer ---")
+
+        rows, cols = matrix.shape
+        mask = np.zeros((rows, cols), dtype=bool)
+
+        effective_border_size = min(border_size, (rows + 1) // 2, (cols + 1) // 2)
+
+        if effective_border_size == 0:
+            return mask
+
+
+        mask[:effective_border_size, :] = True
+        mask[rows - effective_border_size:, :] = True
+        mask[:, :effective_border_size] = True
+        mask[:, cols - effective_border_size:] = True
+        
+        return mask
+    
+    def get_traversable_map(self, border_size):
+        penalty = np.vectorize(self.penalty)
+        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(self.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.map, border_size=border_size))
+        return traversable
+    
+    
     @staticmethod
     def get_buildable_area(steepness_map: np.ndarray,
                        ground_water_map: np.ndarray,

@@ -9,14 +9,11 @@ import numpy as np
 
 class RoadExtendorAgent(Agent):
 
-    def __init__(self, blueprint, search_area, max_width, max_slope):
+    def __init__(self, blueprint, max_width, max_slope):
         super().__init__(blueprint)
         self.type = PlotType.ROAD
         self.max_width = max_width
         self.max_slope = max_slope
-
-        self.min_coords = search_area[0]
-        self.max_coords = search_area[1]
 
     def place(self, loc):
         super().place(loc)
