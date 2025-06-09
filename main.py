@@ -12,8 +12,6 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    
-
     editor = Editor(buffering=True)
     step_size = 32
     gaussian = True

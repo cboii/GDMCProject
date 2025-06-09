@@ -30,17 +30,7 @@ class RoadConnectorAgent(Agent):
 
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
 
-    def penalty(self, x):
-        if x:
-            return 10000
-        return 0
-
     def connect_to_road_network(self, path, execute = False):
-        # penalty = np.vectorize(self.penalty)
-        # traversable_n = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map > 15).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map, border_size=border_size))
-        # path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
-        # if path is None:
-        #     raise CustomError("No optimal path found!")
         path = self.construct_road(path)
         self.place(path)
 

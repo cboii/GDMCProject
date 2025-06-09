@@ -19,11 +19,7 @@ class StructuralAgent(Agent):
                  blueprint,
                  road_connector_agent: RoadConnectorAgent, 
                  activation_step, priority, 
-                 max_slope, 
-                 min_width, 
-                 min_height, 
-                 max_width, 
-                 max_height,
+                 max_slope,
                  max_plots,
                  outside_walls=False,
                  border=1,
@@ -47,7 +43,7 @@ class StructuralAgent(Agent):
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
         # print(self.sizes)
 
-    def __extract_random_box_and_border(self, region_mask: np.ndarray,
+    def __extract_boxes_and_borders(self, region_mask: np.ndarray,
                                             border: int = 1
                                            ) -> tuple[np.ndarray, np.ndarray] | None:
         
@@ -134,7 +130,7 @@ class StructuralAgent(Agent):
             region_mask = (labeled_array == label_id)
             region_size = np.sum(region_mask)
 
-            boxes.extend(self.__extract_random_box_and_border(region_mask, border=1))
+            boxes.extend(self.__extract_boxes_and_borders(region_mask, border=1))
         
         if len(boxes) == 0:
             self.current_choice = None

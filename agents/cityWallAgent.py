@@ -16,10 +16,6 @@ class CityWallAgent(Agent):
                  activation_step, 
                  priority, 
                  max_slope,
-                 min_width, 
-                 min_height, 
-                 max_width, 
-                 max_height,
                  max_plots):
         super().__init__(blueprint)
 
@@ -31,13 +27,6 @@ class CityWallAgent(Agent):
 
         self.min_border_size = 2
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
-
-
-        self.min_width=min_width
-        self.min_height=min_height
-        self.max_width=max_width
-        self.max_height=max_height
-        self.min_size = self.min_width * self.min_height
         
         self.max_plots = max_plots
 
