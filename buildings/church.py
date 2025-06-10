@@ -6,14 +6,19 @@ from building_module import BuildingModule
 from typing import Union, Sequence
 from gdpc import Editor, Block
 from gdpc.vector_tools import Rect, Box
+from pyglm.glm import ivec3
 
 def build_church(   editor: Editor, area: Rect, entrance_pos: tuple, entrance_rotation: int,
                     foundation_block: Union[Block, Sequence[Block]] = Block("stone_bricks"), wood_type: str = "oak"):
     print("Building a church.")
     y = place_rect_foundation(editor, area, foundation_block)
-    house_area = Box((area.offset.x, y, area.offset.y),(area.size.x, y+TILE_SIZE.y*1, area.size.y))
+    if entrance_rotation % 2 != 0:
+        tile_size = ivec3(TILE_SIZE.z, TILE_SIZE.y, TILE_SIZE.x)
+    else:
+        tile_size = TILE_SIZE
+    house_area = Box((area.offset.x, y, area.offset.y),(area.size.x, y+tile_size.y*1, area.size.y))
     
-    pb = PlotBuilder(house_area, 1, TILE_SIZE, tile_rules, tile_directions, tile_quantity_limits, tile_weights)
+    pb = PlotBuilder(house_area, 1, tile_size, tile_rules, tile_directions, tile_quantity_limits, tile_weights)
     pb.create_tile_array()
     pb.wfc(entrance_pos, ("Church_Tower", entrance_rotation))
     pb.build(editor, variation_weights, wood_type)
@@ -21,3 +26,4 @@ def build_church(   editor: Editor, area: Rect, entrance_pos: tuple, entrance_ro
     editor.flushBuffer()
     clean_up_foundation(editor, area, y, exceptions=[])
     editor.flushBuffer()
+

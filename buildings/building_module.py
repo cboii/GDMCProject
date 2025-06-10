@@ -6,8 +6,6 @@ import pickle
 from pathlib import Path
 from random import choice
 
-TILE_SIZE = ivec3(3,4,3)
-
 ROTATION_CORNER_NE = 0
 ROTATION_CORNER_SE = 1
 ROTATION_CORNER_SW = 2
@@ -28,17 +26,17 @@ class BuildingModule:
         self.name = name
         self.blocks = blocks
 
-    def place_module(self, editor: Editor, start: ivec3, rotation: int):
+    def place_module(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int):
         self.randomize_flowers()
         build_area = editor.getBuildArea()
-        target_box = Box(start+build_area.offset, TILE_SIZE)
+        target_box = Box(start+build_area.offset, tile_size)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
                 editor.placeBlock(coords, block)
             
-    def place_module_global(self, editor: Editor, start: ivec3, rotation: int):
+    def place_module_global(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int):
         self.randomize_flowers()
-        target_box = Box(start, TILE_SIZE)
+        target_box = Box(start, tile_size)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
                 editor.placeBlock(coords, block)
@@ -78,21 +76,21 @@ def get_module_from_pkl(name: str):
         module = pickle.load(f)
     return module
 
-def build_module(editor: Editor, name: str, start: ivec3, rotation: int, wood_type: str="oak"):
+def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak"):
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
-    module.place_module(editor, start, rotation)
+    module.place_module(editor, start, tile_size, rotation)
 
-def build_module_global(editor: Editor, name: str, start: ivec3, rotation: int, wood_type: str="oak"):
+def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak"):
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
-    module.place_module_global(editor, start, rotation)
+    module.place_module_global(editor, start, tile_size, rotation)
 
 def main():
     editor = Editor(buffering=True)
-    name = "Church_Altar#0"
+    name = "Townhall_End_Left#0"
     scan_module(editor, name)
-    build_module_global(editor, name, (165, -60, 43), 0, "oak")
+    build_module_global(editor, name, (151, -60, -129), 0, "oak")
     editor.flushBuffer()
 
 if __name__ == "__main__":
