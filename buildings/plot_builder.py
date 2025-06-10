@@ -3,7 +3,8 @@ from gdpc.vector_tools import Box
 from pyglm.glm import ivec3
 import numpy as np
 import numpy.typing as npt
-from tile import *
+from tile import Tile
+from tile import DIR_NORTH, DIR_EAST, DIR_TOP, DIR_SOUTH, DIR_WEST, DIR_BOTTOM
 
 TILES_ALL = 0
 TILES_INNER = 1
@@ -31,10 +32,12 @@ class PlotBuilder:
 
     def create_tile_array(self):
         tile_array_size = ivec3(self.area.size.x // self.tile_size.x, self.floors, self.area.size.z // self.tile_size.z)
+        tile_array_offset_x = (self.area.size.x - (tile_array_size.x * self.tile_size.x)) // 2
+        tile_array_offset_z = (self.area.size.z - (tile_array_size.z * self.tile_size.z)) // 2
         tile_array = np.array([[[Tile((x,y,z), 
-                                    (self.area.offset.x + self.tile_size.x * x, 
+                                    (self.area.offset.x + tile_array_offset_x + self.tile_size.x * x, 
                                     self.area.offset.y + self.tile_size.y * y, 
-                                    self.area.offset.z + self.tile_size.z * z))
+                                    self.area.offset.z + tile_array_offset_z + self.tile_size.z * z), self.tile_size)
                                     for z in range(tile_array_size.z)] 
                                     for y in range(tile_array_size.y)] 
                                     for x in range(tile_array_size.x)], dtype=Tile)
@@ -71,12 +74,12 @@ class PlotBuilder:
                     
                     tile_array[x,y,z].add_possible_modules({module: self.tile_directions[module] for module in list(building_modules_for_tile)})
 
-                    if x > 0: tile_array[x,y,z].set_neighbor(WEST, tile_array[x-1,y,z])
-                    if x < tile_array_size.x-1: tile_array[x,y,z].set_neighbor(EAST, tile_array[x+1,y,z])
-                    if y > 0: tile_array[x,y,z].set_neighbor(BOTTOM, tile_array[x,y-1,z])
-                    if y < tile_array_size.y-1: tile_array[x,y,z].set_neighbor(TOP, tile_array[x,y+1,z])
-                    if z > 0: tile_array[x,y,z].set_neighbor(NORTH, tile_array[x,y,z-1])
-                    if z < tile_array_size.z-1: tile_array[x,y,z].set_neighbor(SOUTH, tile_array[x,y,z+1])
+                    if x > 0: tile_array[x,y,z].set_neighbor(DIR_WEST, tile_array[x-1,y,z])
+                    if x < tile_array_size.x-1: tile_array[x,y,z].set_neighbor(DIR_EAST, tile_array[x+1,y,z])
+                    if y > 0: tile_array[x,y,z].set_neighbor(DIR_BOTTOM, tile_array[x,y-1,z])
+                    if y < tile_array_size.y-1: tile_array[x,y,z].set_neighbor(DIR_TOP, tile_array[x,y+1,z])
+                    if z > 0: tile_array[x,y,z].set_neighbor(DIR_NORTH, tile_array[x,y,z-1])
+                    if z < tile_array_size.z-1: tile_array[x,y,z].set_neighbor(DIR_SOUTH, tile_array[x,y,z+1])
 
         self.tile_array = tile_array
     
@@ -107,7 +110,7 @@ class PlotBuilder:
         for x in range(len(self.tile_array)):
             for y in range(len(self.tile_array[0])):
                 for z in range(len(self.tile_array[0,0])):
-                    print(f"Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, Module: {self.tile_array[x,y,z].selected_module}")
+                    print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
                     self.tile_array[x,y,z].build(editor,variation_weights,wood_type)
 
     

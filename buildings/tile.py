@@ -3,14 +3,23 @@ from pyglm.glm import ivec3
 from gdpc import Editor
 from building_module import *
 
+ROT_NORTH = 0
+ROT_EAST = 1
+ROT_SOUTH = 2
+ROT_WEST = 3
+ROT_ANY = 4
 
+ROT_CNR_NE = 0
+ROT_CNR_SE = 1
+ROT_CNR_SW = 2
+ROT_CNR_NW = 3
 
-NORTH = 0
-EAST = 1
-TOP = 2
-SOUTH = 3
-WEST = 4
-BOTTOM = 5
+DIR_NORTH = 0
+DIR_EAST = 1
+DIR_TOP = 2
+DIR_SOUTH = 3
+DIR_WEST = 4
+DIR_BOTTOM = 5
 
 def create_tile_direction_dict(module_name: str, rot_zero_dict: dict):
     output = {(module_name, 0): rot_zero_dict}
@@ -32,7 +41,7 @@ def create_tile_direction_dict(module_name: str, rot_zero_dict: dict):
 
 class Tile:
     
-    def __init__(self, grid_pos: ivec3, pos: ivec3):
+    def __init__(self, grid_pos: ivec3, pos: ivec3, size: ivec3):
         self.possible_modules = {}
         self.entropy = 0
         self.neighbors = {}
@@ -40,6 +49,7 @@ class Tile:
         self.pos = ivec3(pos)
         self.grid_pos = ivec3(grid_pos)
         self.updated = False
+        self.size = ivec3(size)
 
     def add_possible_modules(self, modules: dict):
         self.possible_modules.update(modules)
@@ -88,6 +98,7 @@ class Tile:
         self.possible_modules = still_possible
         self.entropy = len(self.possible_modules)
         self.updated = True
+        print(f"After update possible tiles: {list(self.possible_modules.keys())}")
         if len(previously_possible)-len(still_possible) > 0:
             for nb in self.neighbors.values():
                     nb.update(tile_quantity_limits)
@@ -121,4 +132,4 @@ class Tile:
             module_name = "Air"
         else:
             module_name = f"{module}#0"
-        build_module_global(editor, module_name, self.pos, rotation, wood_type)
+        build_module_global(editor, module_name, self.pos, self.size, rotation, wood_type)
