@@ -3,6 +3,7 @@ from .bfs import BFS
 from terrain.terrain_manipulator import TerrainManipulator
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
+from buildings.plot_utils import get_entrance_direction
 from buildings.house import build_wooden_house
 from gdpc.vector_tools import Rect
 
@@ -47,4 +48,6 @@ class HousingAgent(StructuralAgent):
     def build(self, loc, w, h):
         print(f"loc: {loc}, w: {w}, h:{h}")
         area = Rect((loc[0],loc[1]), (w,h))
-        build_wooden_house(self.blueprint.map_features.editor, area, (1,0,0), 0)
+        entrance_rot = get_entrance_direction(area, self.blueprint.road_network)
+
+        build_wooden_house(self.blueprint.map_features.editor, area, entrance_rot)

@@ -72,7 +72,7 @@ class Tile:
         if self.entropy == 0 or self.updated:
             return
         
-        print(f"Updating tile {tuple(self.grid_pos)}. Before update possible modules: {list(self.possible_modules.keys())}")
+        #print(f"Updating tile {tuple(self.grid_pos)}.")
         possible_modules_neighbors = {}
         for dir, neighbor in self.neighbors.items():
             if (neighbor.updated or neighbor.entropy == 0) and list(neighbor.possible_modules.keys())[0] != ["Air"]:
@@ -84,9 +84,9 @@ class Tile:
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])
             possible_for_tile_per_neighbor.append(list(possible_for_tile_in_neighbor))
-        print(possible_for_tile_per_neighbor)
+        #print(possible_for_tile_per_neighbor)
         possible_for_tile = set(possible_for_tile_per_neighbor[0]).intersection(*possible_for_tile_per_neighbor)
-        print(f"Ppt: {possible_for_tile}")
+        #print(f"Ppt: {possible_for_tile}")
         
 
         previously_possible = self.possible_modules
@@ -99,7 +99,7 @@ class Tile:
         self.possible_modules = still_possible
         self.entropy = len(self.possible_modules)
         self.updated = True
-        print(f"After update possible tiles: {list(self.possible_modules.keys())}")
+        #print(f"After update possible tiles: {list(self.possible_modules.keys())}")
         if len(previously_possible)-len(still_possible) > 0:
             for nb in self.neighbors.values():
                     nb.update(tile_quantity_limits)
