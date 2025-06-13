@@ -2,12 +2,12 @@ from gdpc import Editor, Block
 from gdpc.geometry import placeCuboid
 from gdpc.transform import rotatedBoxTransform
 from gdpc.vector_tools import Box
-from tile import TILE_SIZE
 from random import choice
 from pyglm.glm import ivec3
 import numpy.typing as npt
 
-def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], wood_type: str):
+def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str):
+    build_area = editor.getBuildArea()
 
     for i in range(tile_array.shape[0]):
         for j in range(tile_array.shape[2]):
@@ -23,8 +23,8 @@ def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], wood_type: s
                 se_corner_tile = tile_array[i][-1][j]
                 break
 
-    nw_corner_coordinate = ivec3(nw_corner_tile.pos.x, nw_corner_tile.pos.y + TILE_SIZE.y-1, nw_corner_tile.pos.z) 
-    se_corner_coordinate = ivec3(se_corner_tile.pos.x + TILE_SIZE.x, se_corner_tile.pos.y + TILE_SIZE.y-1, se_corner_tile.pos.z + TILE_SIZE.z)
+    nw_corner_coordinate = ivec3(build_area.offset.x + nw_corner_tile.pos.x, nw_corner_tile.pos.y + tile_size.y-1, build_area.offset.z + nw_corner_tile.pos.z) 
+    se_corner_coordinate = ivec3(build_area.offset.x + se_corner_tile.pos.x + tile_size.x, se_corner_tile.pos.y + tile_size.y-1, build_area.offset.z + se_corner_tile.pos.z + tile_size.z)
 
     eastwest_length = se_corner_coordinate.x - nw_corner_coordinate.x
     northsouth_length = se_corner_coordinate.z - nw_corner_coordinate.z

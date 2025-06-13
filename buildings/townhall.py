@@ -1,8 +1,8 @@
-from buildingModules.TownHall.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights, tile_quantity_limits, TILE_SIZE
-from base_foundation import place_rect_foundation, clean_up_foundation
-from plot_builder import PlotBuilder
-from tile import Tile
-from building_module import BuildingModule
+from .buildingModules.TownHall.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights, tile_quantity_limits, TILE_SIZE
+from .base_foundation import place_rect_foundation, clean_up_foundation
+from .plot_builder import PlotBuilder
+from .tile import Tile
+from .building_module import BuildingModule
 from typing import Union, Sequence
 from gdpc import Editor, Block
 from gdpc.vector_tools import Rect, Box
@@ -27,8 +27,3 @@ def build_townhall( editor: Editor, area: Rect, entrance_pos: tuple, entrance_ro
     #clean_up_foundation(editor, area, y, exceptions=[])
     #editor.flushBuffer()
 
-
-editor = Editor(buffering=True)
-place_rect_foundation(editor, Rect((0,0), (50, 50)) ,Block("grass_block"))
-area = Rect((0,0), (28, 28))
-build_townhall(editor, area, (0,0,0), 0, wood_type="oak")

@@ -1,7 +1,7 @@
 import random
 from pyglm.glm import ivec3
 from gdpc import Editor
-from building_module import *
+from .building_module import *
 
 ROT_NORTH = 0
 ROT_EAST = 1
@@ -72,7 +72,7 @@ class Tile:
         if self.entropy == 0 or self.updated:
             return
         
-        print(f"Updating tile {tuple(self.grid_pos)}")
+        print(f"Updating tile {tuple(self.grid_pos)}. Before update possible modules: {list(self.possible_modules.keys())}")
         possible_modules_neighbors = {}
         for dir, neighbor in self.neighbors.items():
             if (neighbor.updated or neighbor.entropy == 0) and list(neighbor.possible_modules.keys())[0] != ["Air"]:
@@ -84,8 +84,9 @@ class Tile:
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])
             possible_for_tile_per_neighbor.append(list(possible_for_tile_in_neighbor))
-
+        print(possible_for_tile_per_neighbor)
         possible_for_tile = set(possible_for_tile_per_neighbor[0]).intersection(*possible_for_tile_per_neighbor)
+        print(f"Ppt: {possible_for_tile}")
         
 
         previously_possible = self.possible_modules
@@ -123,6 +124,9 @@ class Tile:
             nb.update(tile_quantity_limits)
 
     def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak"):
+        build_area = editor.getBuildArea()
+        pos_global = ivec3(build_area.offset.x + self.pos.x, self.pos.y, build_area.offset.z + self.pos.z)
+        print(f"Pos Global: {pos_global}")
         module, rotation = self.selected_module
         if module in variation_weights.keys():
             if rotation == 4:
@@ -132,4 +136,4 @@ class Tile:
             module_name = "Air"
         else:
             module_name = f"{module}#0"
-        build_module_global(editor, module_name, self.pos, self.size, rotation, wood_type)
+        build_module_global(editor, module_name, pos_global, self.size, rotation, wood_type)

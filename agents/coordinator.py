@@ -152,13 +152,15 @@ class AgentCoordinator:
                 print(f"--- Agent of type {agent.type.name} activated! ---")
                 break
         
-        if chosen_agent != None:
-
+        if chosen_agent != None:            
             chosen_agent.place()
 
             if execute:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
+                print(f"w: {w}, h: {h}")
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
+                chosen_agent.build([chosen_agent.current_choice[0][0][0], chosen_agent.current_choice[0][0][1]], w, h)
+                
 
             chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
         else:

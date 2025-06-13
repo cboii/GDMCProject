@@ -3,6 +3,8 @@ import numpy as np
 from .bfs import BFS
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
+from buildings.farm import build_farm
+from gdpc.vector_tools import Rect
 
 class FarmAgent(StructuralAgent):
 
@@ -49,3 +51,7 @@ class FarmAgent(StructuralAgent):
         if path_to_own is None:
             return - len(path), path
         return - len(path_to_own), path
+    
+    def build(self, loc, w, h):
+        area = Rect((loc[0],loc[1]), (w,h))
+        build_farm(self.blueprint.map_features.editor, area, (1,0,0), 0)

@@ -67,8 +67,8 @@ class Blueprint:
                        gaussian=False,
                        radius=1):
 
-        x_size = (steepness_map.shape[0] + step_size - 1) // step_size
-        z_size = (steepness_map.shape[1] + step_size - 1) // step_size
+        x_size = (steepness_map.shape[0] + step_size - 1) // step_size -1
+        z_size = (steepness_map.shape[1] + step_size - 1) // step_size -1
         buildable_regions = np.empty((x_size, z_size), dtype=float)
 
         for i in range(x_size):
@@ -97,7 +97,9 @@ class Blueprint:
     
     def get_town_center(self, step_size=32, gaussian=False, radius=1):
         b_area = self.get_buildable_area(self.steepness_map, self.ground_water_map, step_size=step_size, gaussian=gaussian, radius=radius)
+        print(b_area)
         rel_pos = np.array(np.unravel_index(np.argmin(b_area), b_area.shape))
+        print(rel_pos)
         
         rel_pos = [rel_pos[0]*step_size, rel_pos[1]*step_size]
         return b_area, rel_pos
