@@ -1,9 +1,9 @@
 # Directions: North = 0, East = 1, Bottom = 2, South = 3, West = 4, Top = 5
 # Rotations Facing:  North = 0, East = 1, South = 2, West = 3, Don't Care = 4 
-from tile import create_tile_direction_dict
-from tile import ROT_NORTH, ROT_EAST, ROT_SOUTH, ROT_WEST, ROT_ANY
-from tile import ROT_CNR_NE, ROT_CNR_SE, ROT_CNR_SW, ROT_CNR_NW
-from tile import DIR_NORTH, DIR_EAST, DIR_TOP, DIR_SOUTH, DIR_WEST, DIR_BOTTOM
+from ...tile import create_tile_direction_dict
+from ...tile import ROT_NORTH, ROT_EAST, ROT_SOUTH, ROT_WEST, ROT_ANY
+from ...tile import ROT_CNR_NE, ROT_CNR_SE, ROT_CNR_SW, ROT_CNR_NW
+from ...tile import DIR_NORTH, DIR_EAST, DIR_TOP, DIR_SOUTH, DIR_WEST, DIR_BOTTOM
 from pyglm.glm import ivec3
 
 TILE_SIZE = ivec3(3,4,3)

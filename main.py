@@ -8,6 +8,7 @@ from agents.roadAgent import RoadExtendorAgent
 from agents.plots import PlotType
 from agents.housingAgent import HousingAgent
 from agents.coordinator import AgentCoordinator
+from buildings.building_module import BuildingModule
 import numpy as np
 
 

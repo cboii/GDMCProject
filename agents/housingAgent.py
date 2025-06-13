@@ -3,7 +3,8 @@ from .bfs import BFS
 from terrain.terrain_manipulator import TerrainManipulator
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-
+from buildings.house import build_wooden_house
+from gdpc.vector_tools import Rect
 
 class HousingAgent(StructuralAgent):
 
@@ -42,3 +43,8 @@ class HousingAgent(StructuralAgent):
         if path_to_church is None:
             return - len(path), path
         return -len(path_to_church), path
+    
+    def build(self, loc, w, h):
+        print(f"loc: {loc}, w: {w}, h:{h}")
+        area = Rect((loc[0],loc[1]), (w,h))
+        build_wooden_house(self.blueprint.map_features.editor, area, (1,0,0), 0)

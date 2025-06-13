@@ -3,8 +3,8 @@ from gdpc.vector_tools import Box
 from pyglm.glm import ivec3
 import numpy as np
 import numpy.typing as npt
-from tile import Tile
-from tile import DIR_NORTH, DIR_EAST, DIR_TOP, DIR_SOUTH, DIR_WEST, DIR_BOTTOM
+from .tile import Tile
+from .tile import DIR_NORTH, DIR_EAST, DIR_TOP, DIR_SOUTH, DIR_WEST, DIR_BOTTOM
 
 TILES_ALL = 0
 TILES_INNER = 1
@@ -24,13 +24,14 @@ class PlotBuilder:
         self.tile_size = tile_size
         self.tile_rules = tile_rules
         self.tile_directions = tile_directions
-        self.tile_quantity_limits = tile_quantity_limits
+        self.tile_quantity_limits = tile_quantity_limits.copy()
         self.tile_weights = tile_weights
 
         self.tile_array = None
          
 
     def create_tile_array(self):
+        print(f"Area: {self.area}")
         tile_array_size = ivec3(self.area.size.x // self.tile_size.x, self.floors, self.area.size.z // self.tile_size.z)
         tile_array_offset_x = (self.area.size.x - (tile_array_size.x * self.tile_size.x)) // 2
         tile_array_offset_z = (self.area.size.z - (tile_array_size.z * self.tile_size.z)) // 2
@@ -41,6 +42,7 @@ class PlotBuilder:
                                     for z in range(tile_array_size.z)] 
                                     for y in range(tile_array_size.y)] 
                                     for x in range(tile_array_size.x)], dtype=Tile)
+        print(f"tile array shape: {tile_array.shape}")
         
         for x in range(tile_array_size.x):
             for y in range(tile_array_size.y):

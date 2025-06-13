@@ -4,6 +4,8 @@ from .bfs import BFS
 
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
+from buildings.church import build_church
+from gdpc.vector_tools import Rect
 
 
 class ChurchAgent(StructuralAgent):
@@ -36,3 +38,7 @@ class ChurchAgent(StructuralAgent):
         if path is None:
             return -np.inf
         return len(loc), path
+    
+    def build(self, loc, w, h):
+        area = Rect((loc[0],loc[1]), (w,h))
+        build_church(self.blueprint.map_features.editor, area, (0,0,0), 0)

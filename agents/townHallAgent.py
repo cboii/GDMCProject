@@ -4,6 +4,8 @@ from .bfs import BFS
 
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
+from buildings.townhall import build_townhall
+from gdpc.vector_tools import Rect
 
 
 class TownHallAgent(StructuralAgent):
@@ -36,3 +38,7 @@ class TownHallAgent(StructuralAgent):
         if path is None:
             return -np.inf
         return len(loc), path
+    
+    def build(self, loc, w, h):
+        area = Rect((loc[0],loc[1]), (w,h))
+        build_townhall(self.blueprint.map_features.editor, area, (0,0,0), 0)
