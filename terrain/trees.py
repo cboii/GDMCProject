@@ -6,7 +6,7 @@ def removeTrees(editor: Editor):
     world_slice = editor.loadWorldSlice()
     heightmap = world_slice.heightmaps["MOTION_BLOCKING"]
     blocks_for_removal = ["minecraft:air", "minecraft:vine", "minecraft:red_mushroom_block",
-                          "minecraft:mushroom_stem", "minecraft:brown_mushroom_block"]
+                          "minecraft:mushroom_stem", "minecraft:brown_mushroom_block", "minecraft:bamboo"]
 
     for x in range (0, buildArea.end.x - buildArea.offset.x):
         for z in range (0, buildArea.end.z - buildArea.offset.z):

@@ -41,4 +41,4 @@ class ChurchAgent(StructuralAgent):
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
-        build_church(self.blueprint.map_features.editor, area, (0,0,0), 0)
+        build_church(self.blueprint, area)

@@ -48,6 +48,5 @@ class HousingAgent(StructuralAgent):
     def build(self, loc, w, h):
         print(f"loc: {loc}, w: {w}, h:{h}")
         area = Rect((loc[0],loc[1]), (w,h))
-        entrance_rot = get_entrance_direction(area, self.blueprint.road_network)
 
-        build_wooden_house(self.blueprint.map_features.editor, area, entrance_rot)
+        build_wooden_house(self.blueprint, area)

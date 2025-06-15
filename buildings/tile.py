@@ -98,6 +98,9 @@ class Tile:
 
         self.possible_modules = still_possible
         self.entropy = len(self.possible_modules)
+        print(list(self.possible_modules.keys())[0][0])
+        if self.entropy == 1 and list(self.possible_modules.keys())[0][0] == "Air":
+            self.entropy = 100
         self.updated = True
         #print(f"After update possible tiles: {list(self.possible_modules.keys())}")
         if len(previously_possible)-len(still_possible) > 0:

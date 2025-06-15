@@ -47,4 +47,4 @@ class FarmAgent(StructuralAgent):
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
-        build_farm(self.blueprint.map_features.editor, area, (1,0,0), 0)
+        build_farm(self.blueprint, area)

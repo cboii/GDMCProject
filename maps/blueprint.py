@@ -144,4 +144,10 @@ class Blueprint:
     
     def get_center_district_map(self, step_size=32):
         pass
+    
+    def reload_feature_maps(self):
+        self.map_features.reload_world_slice()
+        self.height_map = self.map_features.create_heightmap()
+        self.steepness_map = self.map_features.create_gradient_maps()[4]
+        self.ground_water_map = self.map_features.create_groundwater_map()
         

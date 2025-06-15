@@ -87,3 +87,6 @@ class MapFeatureExtractor:
     def create_heightmap(self):
         return self.world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]
     
+    def reload_world_slice(self):
+        self.world_slice = self.editor.loadWorldSlice()
+    
