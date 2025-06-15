@@ -5,6 +5,7 @@ from .StructuralAgent import StructuralAgent
 from .plots import PlotType
 from buildings.farm import build_farm
 from gdpc.vector_tools import Rect
+from random import choice
 
 class FarmAgent(StructuralAgent):
 
@@ -47,4 +48,5 @@ class FarmAgent(StructuralAgent):
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
-        build_farm(self.blueprint, area)
+        wood_type = choice(["oak", "spruce"])
+        build_farm(self.blueprint, area, wood_type=wood_type)

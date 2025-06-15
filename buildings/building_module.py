@@ -44,6 +44,7 @@ class BuildingModule:
     def change_wood_type(self, type: str):
         for block in self.blocks.values():
             block.id = block.id.replace(":oak", f":{type}")
+            block.id = block.id.replace(":stripped_oak", f":stripped_{type}")
 
     def randomize_flowers(self):
         for block in self.blocks.values():

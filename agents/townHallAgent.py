@@ -1,3 +1,4 @@
+from random import choice
 import numpy as np
 
 from .bfs import BFS
@@ -41,4 +42,5 @@ class TownHallAgent(StructuralAgent):
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
-        build_townhall(self.blueprint, area)
+        wood_type = choice(["oak", "spruce"])
+        build_townhall(self.blueprint, area, wood_type=wood_type)

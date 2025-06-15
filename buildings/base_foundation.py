@@ -67,12 +67,12 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, sigma: float, max_wi
     smooth_area = Rect(area.offset-max_width, area.size + 2* max_width)
     if include_area:
         for x,z in smooth_area:
-            if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and (blueprint.map[x,z] in [0] or Rect(area.offset-1, area.size+2).contains((x,z))):
+            if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and world_slice.getBlock((x,height_map[x,z]-1,z)).id != "minecraft:water" and (blueprint.map[x,z] in [0] or Rect(area.offset-1, area.size+2).contains((x,z))):
                 placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), block)
                 placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
     else:
         for x,z in smooth_area:
-            if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and blueprint.map[x,z] in [0,35] and not Rect(area.offset, area.size).contains((x,z)):
+            if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and blueprint.map[x,z] in [0,35] and world_slice.getBlock((x,height_map[x,z]-1,z)).id != "minecraft:water" and not Rect(area.offset, area.size).contains((x,z)):
                 placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), block)
                 placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
     editor.flushBuffer()
