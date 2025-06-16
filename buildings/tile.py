@@ -84,9 +84,9 @@ class Tile:
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])
             possible_for_tile_per_neighbor.append(list(possible_for_tile_in_neighbor))
-        #print(possible_for_tile_per_neighbor)
+        print(possible_for_tile_per_neighbor)
         possible_for_tile = set(possible_for_tile_per_neighbor[0]).intersection(*possible_for_tile_per_neighbor)
-        #print(f"Ppt: {possible_for_tile}")
+        print(f"Ppt: {possible_for_tile}")
         
 
         previously_possible = self.possible_modules
@@ -102,7 +102,7 @@ class Tile:
         if self.entropy == 1 and list(self.possible_modules.keys())[0][0] == "Air":
             self.entropy = 100
         self.updated = True
-        #print(f"After update possible tiles: {list(self.possible_modules.keys())}")
+        print(f"After update possible tiles: {list(self.possible_modules.keys())}")
         if len(previously_possible)-len(still_possible) > 0:
             for nb in self.neighbors.values():
                     nb.update(tile_quantity_limits)

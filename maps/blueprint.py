@@ -20,9 +20,10 @@ class Blueprint:
         self.borders: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.farms: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.church: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
-        self.well: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.decoration: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.city_walls: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.town_hall: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.inn: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.outside_walls_area = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
 
     def place(self, loc: np.ndarray, type: PlotType):
@@ -40,12 +41,15 @@ class Blueprint:
                 case PlotType.FARM:
                     self.map[x, y] = 150
                     self.farms[x,y] = True
-                case PlotType.WELL:
+                case PlotType.DECORATION:
                     self.map[x, y] = 100
-                    self.well[x,y] = True
+                    self.decoration[x,y] = True
                 case PlotType.TOWNHALL:
                     self.map[x,y]=175
                     self.town_hall[x,y] = True
+                case PlotType.INN:
+                    self.map[x,y]=125
+                    self.inn[x,y] = True
                 case PlotType.CHURCH:
                     self.map[x,y]=50
                     self.church[x,y] = True

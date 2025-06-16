@@ -10,3 +10,6 @@ class PlotType(Enum):
     CHURCH = 6
     CITYWALL = 7
     TOWNHALL = 8
+    INN = 9
+    DECORATION = 10
+    TREE = 11

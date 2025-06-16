@@ -11,24 +11,24 @@ def find_nearest_road_block(road_map, point: ivec2) -> ivec2:
 
 def get_entrance_direction(area: Rect, road_map) -> int:
     nearest_rb = find_nearest_road_block(road_map, area.center)
-    if nearest_rb.y <= area.offset.y:
-        if area.offset.y - nearest_rb.y < area.offset.x - nearest_rb.x:
+    if nearest_rb.y <= area.offset.y+1:
+        if area.offset.y+1 - nearest_rb.y < area.offset.x+1 - nearest_rb.x:
             return 3
-        elif area.offset.y - nearest_rb.y < nearest_rb.x - area.end.x:
+        elif area.offset.y+1 - nearest_rb.y < nearest_rb.x - area.end.x-1:
             return 1
         else:
             return 0
-    elif nearest_rb.y >= area.end.y:
-        if nearest_rb.y - area.end.y < area.offset.x - nearest_rb.x:
+    elif nearest_rb.y >= area.end.y-1:
+        if nearest_rb.y - area.end.y-1 < area.offset.x+1 - nearest_rb.x:
             return 3
-        elif nearest_rb.y - area.end.y < nearest_rb.x - area.end.x:
+        elif nearest_rb.y - area.end.y-1 < nearest_rb.x - area.end.x-1:
             return 1
         else:
             return 2
     else:
-        if area.offset.x >= nearest_rb.x:
+        if area.offset.x+1 >= nearest_rb.x:
             return 3
-        elif area.end.x <= nearest_rb.x:
+        elif area.end.x-1 <= nearest_rb.x:
             return 1
 
 def get_entrance_direction_big_buildings(area: Rect, road_map, face_width: int) -> int:

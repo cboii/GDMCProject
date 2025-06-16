@@ -1,6 +1,7 @@
 from gdpc import Editor, Block, geometry, vector_tools
 from maps.blueprint import Blueprint
 import numpy as np
+from buildings.base_foundation import smooth_edges_gaussian
 
 class TerrainManipulator:
     def __init__(self, blueprint: Blueprint):
@@ -33,6 +34,9 @@ class TerrainManipulator:
             for z in range(loc[1], loc[1] + h):
                 for y in range(max_height - area_height[x - loc[0],z - loc[1]]):
                     self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + x, self.blueprint.height_map[x,z] + y - 1, self.blueprint.map_features.build_area.offset.z + z), Block("cobblestone"))
+        
+        area = vector_tools.Rect((loc[0],loc[1]), (w,h))
+        smooth_edges_gaussian(self.blueprint, area, sigma=7, max_width=15, include_area=True)
 
         
     def place_road_segment(self, loc):

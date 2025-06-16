@@ -5,7 +5,7 @@ from terrain.terrain_manipulator import TerrainManipulator
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
 from buildings.plot_utils import get_entrance_direction
-from buildings.house import build_wooden_house
+from buildings.buildingModules.House.house import build_wooden_house
 from gdpc.vector_tools import Rect
 
 class HousingAgent(StructuralAgent):

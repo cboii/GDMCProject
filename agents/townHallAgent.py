@@ -5,7 +5,7 @@ from .bfs import BFS
 
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-from buildings.townhall import build_townhall
+from buildings.buildingModules.TownHall.townhall import build_townhall
 from gdpc.vector_tools import Rect
 
 

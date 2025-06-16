@@ -1,9 +1,9 @@
-from .buildingModules.TownHall.tile_rules import tile_rules, tile_directions, tile_weights, variation_weights, tile_quantity_limits, TILE_SIZE
-from .base_foundation import place_rect_foundation, clean_up_foundation, place_border, smooth_edges_gaussian
-from .plot_utils import get_entrance_direction_big_buildings, get_entrance_pos_fixed
-from .plot_builder import PlotBuilder
-from .tile import Tile
-from .building_module import BuildingModule
+from .tile_rules import tile_rules, tile_directions, tile_weights, variation_weights, tile_quantity_limits, TILE_SIZE
+from ...base_foundation import place_rect_foundation, clean_up_foundation, place_border, smooth_edges_gaussian
+from ...plot_utils import get_entrance_direction_big_buildings, get_entrance_pos_fixed
+from ...plot_builder import PlotBuilder
+from ...tile import Tile
+from ...building_module import BuildingModule
 from maps.blueprint import Blueprint
 from typing import Union, Sequence
 from gdpc import Editor, Block
@@ -14,7 +14,7 @@ def build_townhall( blueprint: Blueprint, area: Rect,
                     foundation_block: Union[Block, Sequence[Block]] = Block("gravel"), wood_type: str = "oak"):
     print("Building a town hall.")
     editor = blueprint.map_features.editor
-    smooth_edges_gaussian(blueprint, area, sigma=5, max_width=10, include_area=True)
+    #smooth_edges_gaussian(blueprint, area, sigma=5, max_width=10, include_area=True)
     y = place_rect_foundation(editor, area, foundation_block)
     entrance_rotation = get_entrance_direction_big_buildings(area, blueprint.road_network, 22)
     if entrance_rotation % 2 != 0:

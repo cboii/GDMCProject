@@ -64,8 +64,8 @@ for name, rot_zero_dict in tile_directions_zero.items():
 
 tile_weights = {    "TownHall_Front_Left": 1,
                     "TownHall_Front_Right": 1,
-                    "TownHall_Middle_Left": 10,
-                    "TownHall_Middle_Right": 10,
+                    "TownHall_Middle_Left": 50,
+                    "TownHall_Middle_Right": 50,
                     "TownHall_End_Left" : 1,
                     "TownHall_End_Right" : 1,
                     "Air": 1}

@@ -38,8 +38,8 @@ class CityWallAgent(Agent):
     def try_place(self):
         house_coordinates = np.argwhere(self.blueprint.map)
         area = []
-        for x_step in [-3,0,3]:
-            for z_step in [-3,0,3]:
+        for x_step in [0]:
+            for z_step in [0]:
                 for coord in house_coordinates:
                     if coord[0]+x_step > self.blueprint.map.shape[0] - 1 or coord[0]+x_step < 0 or coord[1]+z_step > self.blueprint.map.shape[1] - 1 or coord[1]+z_step < 0:
                         continue

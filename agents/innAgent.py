@@ -1,14 +1,15 @@
 import numpy as np
+from random import choice
 
 from .bfs import BFS
 
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-from buildings.buildingModules.Church.church import build_church
+from buildings.buildingModules.Inn.inn import build_inn
 from gdpc.vector_tools import Rect
 
 
-class ChurchAgent(StructuralAgent):
+class InnAgent(StructuralAgent):
 
     def __init__(self, 
                  blueprint,
@@ -30,7 +31,7 @@ class ChurchAgent(StructuralAgent):
                          border,
                          sizes)
         
-        self.type = PlotType.CHURCH
+        self.type = PlotType.INN
 
     def evaluate(self, loc, border_size=3):
         traversable_n = self.blueprint.get_traversable_map(border_size)
@@ -41,4 +42,5 @@ class ChurchAgent(StructuralAgent):
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
-        build_church(self.blueprint, area)
+        wood_type = choice(["oak", "spruce"])
+        build_inn(self.blueprint, area, wood_type=wood_type)

@@ -6,6 +6,8 @@ from .roadAgent import RoadConnectorAgent
 from .housingAgent import HousingAgent
 from .churchAgent import ChurchAgent
 from .farmAgent import FarmAgent
+from .innAgent import InnAgent
+from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 
 
@@ -35,11 +37,11 @@ class AgentCoordinator:
                                           outside_walls=False,
                                           border=1,
                                           sizes = list(set([(h, w)
-                                            for h in range(11, 20 + 1)
-                                            for w in range(14,  23 + 1)]) | 
+                                            for h in range(11, 17 + 1)
+                                            for w in range(11,  20 + 1)]) | 
                                             set([(h, w)
-                                            for h in range(14,  23 + 1)
-                                            for w in range(11, 20 + 1)])))
+                                            for h in range(11,  20 + 1)
+                                            for w in range(11, 17 + 1)])))
         
         self.town_hall_agent = TownHallAgent(blueprint=blueprint, 
                                           road_connector_agent=self.road_connector_agent, 
@@ -76,12 +78,30 @@ class AgentCoordinator:
                                         priority=3,
                                         max_slope=5,
                                         max_plots=1)
+        self.inn_agent = InnAgent(blueprint=blueprint,
+                                        road_connector_agent=self.road_connector_agent,
+                                        activation_step=0,
+                                        priority=1,
+                                        max_slope=2,
+                                        max_plots=2,
+                                        outside_walls=False,
+                                        border=1,
+                                        sizes=[(15, 13), (20, 13), (25, 13), (13, 15), (13, 20), (13, 25)])
+        self.decoration_agent = DecorationAgent(blueprint=blueprint,
+                                        road_connector_agent=self.road_connector_agent,
+                                        activation_step=10,
+                                        priority=0,
+                                        max_slope=2,
+                                        max_plots=100,
+                                        outside_walls=False,
+                                        border=1,
+                                        sizes=[(5,2), (2,5), (7,4), (4,7), (3,3), (7,7)])
 
         self.road_connector_agent.place([[begin[0]  + step_size // 2, begin[1] + step_size // 2]])
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent]:
+        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent]:
             if agent.activation_step <= self.timestep and agent.plots_left != 0:
                 self.active_agents.append(agent)
 
@@ -151,13 +171,15 @@ class AgentCoordinator:
 
             if execute:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
-                print(f"w: {w}, h: {h}")
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
+                self.blueprint.reload_feature_maps()
+            
+            chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
+
+            if execute:
                 chosen_agent.build([chosen_agent.current_choice[0][0][0], chosen_agent.current_choice[0][0][1]], w, h)
                 self.blueprint.reload_feature_maps()
-                
 
-            chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
         else:
             self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")

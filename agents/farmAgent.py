@@ -3,7 +3,7 @@ import numpy as np
 from .bfs import BFS
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-from buildings.farm import build_farm
+from buildings.buildingModules.Farm.farm import build_farm
 from gdpc.vector_tools import Rect
 from random import choice
 

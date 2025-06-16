@@ -81,17 +81,22 @@ def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rota
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
     module.place_module(editor, start, tile_size, rotation)
+    editor.flushBuffer()
 
 def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak"):
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
     module.place_module_global(editor, start, tile_size, rotation)
+    editor.flushBuffer()
 
 def main():
     editor = Editor(buffering=True)
-    name = "Townhall_End_Left#0"
+    
+    name = "Inn_End#1"
     scan_module(editor, name)
-    build_module_global(editor, name, (151, -60, -129), 0, "oak")
+    build_module_global(editor, name, (-78, -60, 32), (13,16,5), 0, "oak")
+    
+    #build_module_global(editor, "Misc_Smithy#0", (-94, -60, 11), (13,16,5), 0, "oak")
     editor.flushBuffer()
 
 if __name__ == "__main__":
