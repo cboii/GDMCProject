@@ -26,7 +26,7 @@ def build_townhall( blueprint: Blueprint, area: Rect,
     pb = PlotBuilder(house_area, 1, tile_size, tile_rules, tile_directions, tile_quantity_limits, tile_weights)
     pb.create_tile_array()
     entrance_pos = get_entrance_pos_fixed(pb.tile_array, entrance_rotation, [0,0,1,1])
-    pb.wfc(entrance_pos, ("TownHall_Front_Right", entrance_rotation))
+    pb.wfc(entrance_pos, ("Townhall_Front_Right", entrance_rotation))
     pb.build(editor, variation_weights, wood_type)
 
     editor.flushBuffer()

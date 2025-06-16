@@ -10,38 +10,38 @@ TILE_SIZE = ivec3(11,20,7)
 
 tile_quantity_limits = {}
 
-tile_directions_zero = {    "TownHall_Front_Left":          {   DIR_NORTH: [("Air",ROT_ANY)],
+tile_directions_zero = {    "Townhall_Front_Left":          {   DIR_NORTH: [("Air",ROT_ANY)],
                                                                 DIR_EAST: [("Air",ROT_ANY)],
                                                                 DIR_TOP: [],
-                                                                DIR_SOUTH: [("TownHall_Middle_Left", ROT_NORTH)],
-                                                                DIR_WEST: [("TownHall_Front_Right", ROT_NORTH)],
+                                                                DIR_SOUTH: [("Townhall_Middle_Left", ROT_NORTH)],
+                                                                DIR_WEST: [("Townhall_Front_Right", ROT_NORTH)],
                                                                 DIR_BOTTOM: []},
-                            "TownHall_Front_Right":         {   DIR_NORTH: [("Air",ROT_ANY)],
-                                                                DIR_EAST: [("TownHall_Front_Left", ROT_NORTH)],
+                            "Townhall_Front_Right":         {   DIR_NORTH: [("Air",ROT_ANY)],
+                                                                DIR_EAST: [("Townhall_Front_Left", ROT_NORTH)],
                                                                 DIR_TOP: [],
-                                                                DIR_SOUTH: [("TownHall_Middle_Right", ROT_NORTH)],
+                                                                DIR_SOUTH: [("Townhall_Middle_Right", ROT_NORTH)],
                                                                 DIR_WEST: [("Air",ROT_ANY)],
                                                                 DIR_BOTTOM: []},
-                            "TownHall_Middle_Left":         {   DIR_NORTH: [("TownHall_Front_Left", ROT_NORTH), ("TownHall_Middle_Left", ROT_NORTH)],
+                            "Townhall_Middle_Left":         {   DIR_NORTH: [("Townhall_Front_Left", ROT_NORTH), ("Townhall_Middle_Left", ROT_NORTH)],
                                                                 DIR_EAST: [("Air",ROT_ANY)],
                                                                 DIR_TOP: [],
-                                                                DIR_SOUTH: [("TownHall_Middle_Left", ROT_NORTH), ("TownHall_End_Left", ROT_NORTH)],
-                                                                DIR_WEST: [("TownHall_Middle_Right", ROT_NORTH)],
+                                                                DIR_SOUTH: [("Townhall_Middle_Left", ROT_NORTH), ("Townhall_End_Left", ROT_NORTH)],
+                                                                DIR_WEST: [("Townhall_Middle_Right", ROT_NORTH)],
                                                                 DIR_BOTTOM: []},
-                            "TownHall_Middle_Right":        {   DIR_NORTH: [("TownHall_Front_Right", ROT_NORTH), ("TownHall_Middle_Right", ROT_NORTH)],
-                                                                DIR_EAST: [("TownHall_Middle_Left", ROT_NORTH)],
+                            "Townhall_Middle_Right":        {   DIR_NORTH: [("Townhall_Front_Right", ROT_NORTH), ("Townhall_Middle_Right", ROT_NORTH)],
+                                                                DIR_EAST: [("Townhall_Middle_Left", ROT_NORTH)],
                                                                 DIR_TOP: [],
-                                                                DIR_SOUTH: [("TownHall_Middle_Right", ROT_NORTH), ("TownHall_End_Right", ROT_NORTH)],
+                                                                DIR_SOUTH: [("Townhall_Middle_Right", ROT_NORTH), ("Townhall_End_Right", ROT_NORTH)],
                                                                 DIR_WEST: [("Air",ROT_ANY)],
                                                                 DIR_BOTTOM: []},
-                            "TownHall_End_Left":            {   DIR_NORTH: [("TownHall_Middle_Left", ROT_NORTH)],
+                            "Townhall_End_Left":            {   DIR_NORTH: [("Townhall_Middle_Left", ROT_NORTH)],
                                                                 DIR_EAST: [("Air",ROT_ANY)],
                                                                 DIR_TOP: [],
                                                                 DIR_SOUTH: [("Air",ROT_ANY)],
-                                                                DIR_WEST: [("TownHall_End_Right", ROT_NORTH)],
+                                                                DIR_WEST: [("Townhall_End_Right", ROT_NORTH)],
                                                                 DIR_BOTTOM: []},
-                            "TownHall_End_Right":           {   DIR_NORTH: [("TownHall_Middle_Right", ROT_NORTH)],
-                                                                DIR_EAST: [("TownHall_End_Left", ROT_NORTH)],
+                            "Townhall_End_Right":           {   DIR_NORTH: [("Townhall_Middle_Right", ROT_NORTH)],
+                                                                DIR_EAST: [("Townhall_End_Left", ROT_NORTH)],
                                                                 DIR_TOP: [],
                                                                 DIR_SOUTH: [("Air",ROT_ANY)],
                                                                 DIR_WEST: [("Air",ROT_ANY)],
@@ -62,57 +62,57 @@ for name, rot_zero_dict in tile_directions_zero.items():
     else:
         tile_directions.update(create_tile_direction_dict(name, rot_zero_dict))
 
-tile_weights = {    "TownHall_Front_Left": 1,
-                    "TownHall_Front_Right": 1,
-                    "TownHall_Middle_Left": 50,
-                    "TownHall_Middle_Right": 50,
-                    "TownHall_End_Left" : 1,
-                    "TownHall_End_Right" : 1,
+tile_weights = {    "Townhall_Front_Left": 1,
+                    "Townhall_Front_Right": 1,
+                    "Townhall_Middle_Left": 50,
+                    "Townhall_Middle_Right": 50,
+                    "Townhall_End_Left" : 1,
+                    "Townhall_End_Right" : 1,
                     "Air": 1}
 
-variation_weights = {"TownHall_Middle_Left": {"TownHall_Middle_Left#0": 1, "TownHall_Middle_Left#1": 1, "TownHall_Middle_Left#2": 1},
-                     "TownHall_Middle_Right": {"TownHall_Middle_Right#0": 1, "TownHall_Middle_Right#1": 1, "TownHall_Middle_Right#2": 1}}
+variation_weights = {"Townhall_Middle_Left": {"Townhall_Middle_Left#0": 1, "Townhall_Middle_Left#1": 1, "Townhall_Middle_Left#2": 1},
+                     "Townhall_Middle_Right": {"Townhall_Middle_Right#0": 1, "Townhall_Middle_Right#1": 1, "Townhall_Middle_Right#2": 1}}
 
 
-tiles_possible_all = [  ("TownHall_Front_Left", ROT_NORTH), ("TownHall_Front_Left", ROT_EAST), ("TownHall_Front_Left", ROT_SOUTH), ("TownHall_Front_Left", ROT_WEST),
-                        ("TownHall_Front_Right", ROT_NORTH), ("TownHall_Front_Right", ROT_EAST), ("TownHall_Front_Right", ROT_SOUTH), ("TownHall_Front_Right", ROT_WEST),
-                        ("TownHall_Middle_Left", ROT_NORTH), ("TownHall_Middle_Left", ROT_EAST), ("TownHall_Middle_Left", ROT_SOUTH), ("TownHall_Middle_Left", ROT_WEST),
-                        ("TownHall_Middle_Right", ROT_NORTH), ("TownHall_Middle_Right", ROT_EAST), ("TownHall_Middle_Right", ROT_SOUTH), ("TownHall_Middle_Right", ROT_WEST),
-                        ("TownHall_End_Left", ROT_NORTH), ("TownHall_End_Left", ROT_EAST), ("TownHall_End_Left", ROT_SOUTH), ("TownHall_End_Left", ROT_WEST),
-                        ("TownHall_End_Right", ROT_NORTH), ("TownHall_End_Right", ROT_EAST), ("TownHall_End_Right", ROT_SOUTH), ("TownHall_End_Right", ROT_WEST),
+tiles_possible_all = [  ("Townhall_Front_Left", ROT_NORTH), ("Townhall_Front_Left", ROT_EAST), ("Townhall_Front_Left", ROT_SOUTH), ("Townhall_Front_Left", ROT_WEST),
+                        ("Townhall_Front_Right", ROT_NORTH), ("Townhall_Front_Right", ROT_EAST), ("Townhall_Front_Right", ROT_SOUTH), ("Townhall_Front_Right", ROT_WEST),
+                        ("Townhall_Middle_Left", ROT_NORTH), ("Townhall_Middle_Left", ROT_EAST), ("Townhall_Middle_Left", ROT_SOUTH), ("Townhall_Middle_Left", ROT_WEST),
+                        ("Townhall_Middle_Right", ROT_NORTH), ("Townhall_Middle_Right", ROT_EAST), ("Townhall_Middle_Right", ROT_SOUTH), ("Townhall_Middle_Right", ROT_WEST),
+                        ("Townhall_End_Left", ROT_NORTH), ("Townhall_End_Left", ROT_EAST), ("Townhall_End_Left", ROT_SOUTH), ("Townhall_End_Left", ROT_WEST),
+                        ("Townhall_End_Right", ROT_NORTH), ("Townhall_End_Right", ROT_EAST), ("Townhall_End_Right", ROT_SOUTH), ("Townhall_End_Right", ROT_WEST),
                         ("Air", ROT_ANY)]
 
 tiles_possible_inner = tiles_possible_all
 
-tiles_possible_edge_north = [   ("TownHall_Front_Left", ROT_NORTH), ("TownHall_Front_Left", ROT_WEST),
-                                ("TownHall_Front_Right", ROT_NORTH), ("TownHall_Front_Right", ROT_EAST),
-                                ("TownHall_Middle_Right", ROT_EAST), ("TownHall_Middle_Left", ROT_WEST),
-                                ("TownHall_End_Right", ROT_EAST), ("TownHall_End_Left", ROT_WEST),
-                                ("TownHall_End_Left", ROT_SOUTH), ("TownHall_End_Right", ROT_SOUTH),
+tiles_possible_edge_north = [   ("Townhall_Front_Left", ROT_NORTH), ("Townhall_Front_Left", ROT_WEST),
+                                ("Townhall_Front_Right", ROT_NORTH), ("Townhall_Front_Right", ROT_EAST),
+                                ("Townhall_Middle_Right", ROT_EAST), ("Townhall_Middle_Left", ROT_WEST),
+                                ("Townhall_End_Right", ROT_EAST), ("Townhall_End_Left", ROT_WEST),
+                                ("Townhall_End_Left", ROT_SOUTH), ("Townhall_End_Right", ROT_SOUTH),
                                 ("Air", ROT_ANY)]
 
-tiles_possible_edge_east =  [   ("TownHall_Front_Left", ROT_EAST), ("TownHall_Front_Left", ROT_NORTH),
-                                ("TownHall_Front_Right", ROT_EAST), ("TownHall_Front_Right", ROT_SOUTH), 
-                                ("TownHall_Middle_Right", ROT_SOUTH), ("TownHall_Middle_Left", ROT_NORTH),
-                                ("TownHall_End_Left", ROT_WEST), ("TownHall_End_Left", ROT_NORTH),
-                                ("TownHall_End_Right", ROT_WEST), ("TownHall_End_Right", ROT_SOUTH),
+tiles_possible_edge_east =  [   ("Townhall_Front_Left", ROT_EAST), ("Townhall_Front_Left", ROT_NORTH),
+                                ("Townhall_Front_Right", ROT_EAST), ("Townhall_Front_Right", ROT_SOUTH), 
+                                ("Townhall_Middle_Right", ROT_SOUTH), ("Townhall_Middle_Left", ROT_NORTH),
+                                ("Townhall_End_Left", ROT_WEST), ("Townhall_End_Left", ROT_NORTH),
+                                ("Townhall_End_Right", ROT_WEST), ("Townhall_End_Right", ROT_SOUTH),
                                 ("Air", ROT_ANY)]
 
 tiles_possible_edge_top = tiles_possible_all
 
-tiles_possible_edge_south = [   ("TownHall_Front_Left", ROT_SOUTH), ("TownHall_Front_Left", ROT_EAST),
-                                ("TownHall_Front_Right", ROT_SOUTH), ("TownHall_Front_Right", ROT_WEST),
-                                ("TownHall_Middle_Right", ROT_WEST), ("TownHall_Middle_Left", ROT_EAST),
-                                ("TownHall_End_Right", ROT_WEST), ("TownHall_End_Left", ROT_EAST),
-                                ("TownHall_End_Left", ROT_NORTH), ("TownHall_End_Right", ROT_NORTH),
+tiles_possible_edge_south = [   ("Townhall_Front_Left", ROT_SOUTH), ("Townhall_Front_Left", ROT_EAST),
+                                ("Townhall_Front_Right", ROT_SOUTH), ("Townhall_Front_Right", ROT_WEST),
+                                ("Townhall_Middle_Right", ROT_WEST), ("Townhall_Middle_Left", ROT_EAST),
+                                ("Townhall_End_Right", ROT_WEST), ("Townhall_End_Left", ROT_EAST),
+                                ("Townhall_End_Left", ROT_NORTH), ("Townhall_End_Right", ROT_NORTH),
                                 ("Air", ROT_ANY)]
 
 
-tiles_possible_edge_west =  [   ("TownHall_Front_Left", ROT_WEST), ("TownHall_Front_Left", ROT_SOUTH),
-                                ("TownHall_Front_Right", ROT_WEST), ("TownHall_Front_Right", ROT_NORTH), 
-                                ("TownHall_Middle_Right", ROT_NORTH), ("TownHall_Middle_Left", ROT_SOUTH),
-                                ("TownHall_End_Left", ROT_EAST), ("TownHall_End_Left", ROT_SOUTH),
-                                ("TownHall_End_Right", ROT_EAST), ("TownHall_End_Right", ROT_NORTH),
+tiles_possible_edge_west =  [   ("Townhall_Front_Left", ROT_WEST), ("Townhall_Front_Left", ROT_SOUTH),
+                                ("Townhall_Front_Right", ROT_WEST), ("Townhall_Front_Right", ROT_NORTH), 
+                                ("Townhall_Middle_Right", ROT_NORTH), ("Townhall_Middle_Left", ROT_SOUTH),
+                                ("Townhall_End_Left", ROT_EAST), ("Townhall_End_Left", ROT_SOUTH),
+                                ("Townhall_End_Right", ROT_EAST), ("Townhall_End_Right", ROT_NORTH),
                                 ("Air", ROT_ANY)]
 
 tiles_possible_edge_bottom = tiles_possible_all
