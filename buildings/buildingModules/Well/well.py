@@ -7,10 +7,10 @@ from gdpc import Editor, Block
 from gdpc.vector_tools import Rect, Box
 from pyglm.glm import ivec3, ivec2
 
-TILE_SIZE = ivec3(5,3,4)
-MODULES = ["Decoration_Bench#0", "Decoration_Campfire#0", "Decoration_Flowerbed#0", "Decoration_Flowerbed#1"]
+TILE_SIZE = ivec3(7,7,7)
+MODULES = ["Well_Small#0", "Well_Large#0"]
 
-def build_decoration( blueprint: Blueprint, area: Rect,
+def build_well( blueprint: Blueprint, area: Rect,
                     foundation_block: Union[Block, Sequence[Block]] = Block("grass_block"), wood_type: str = "oak"):
     editor = blueprint.map_features.editor
     #smooth_edges_gaussian(blueprint, area, sigma=5, max_width=10, include_area=True)
@@ -18,10 +18,7 @@ def build_decoration( blueprint: Blueprint, area: Rect,
 
     module = choice(MODULES)
     print(f"Building {module}.")
-    if TILE_SIZE.x == area.size.x:
-        rot = choice([0,2])
-    else:
-        rot = choice([1,3])
+    rot = choice([0,1,2,3])
 
     build_module(editor, module, (area.offset.x, y, area.offset.y), TILE_SIZE, rot, wood_type)
 

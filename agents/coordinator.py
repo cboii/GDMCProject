@@ -9,6 +9,7 @@ from .farmAgent import FarmAgent
 from .innAgent import InnAgent
 from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
+from .wellAgent import WellAgent
 
 
 class AgentCoordinator:
@@ -95,13 +96,22 @@ class AgentCoordinator:
                                         max_plots=100,
                                         outside_walls=False,
                                         border=1,
-                                        sizes=[(5,2), (2,5), (7,4), (4,7), (3,3), (7,7)])
+                                        sizes=[(5,4), (4,5)])
+        self.well_agent = WellAgent(blueprint=blueprint,
+                                        road_connector_agent=self.road_connector_agent,
+                                        activation_step=10,
+                                        priority=0,
+                                        max_slope=2,
+                                        max_plots=2,
+                                        outside_walls=False,
+                                        border=1,
+                                        sizes=[(7,7)])
 
         self.road_connector_agent.place([[begin[0]  + step_size // 2, begin[1] + step_size // 2]])
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent]:
+        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent]:
             if agent.activation_step <= self.timestep and agent.plots_left != 0:
                 self.active_agents.append(agent)
 
