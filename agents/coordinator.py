@@ -10,6 +10,7 @@ from .innAgent import InnAgent
 from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 from .wellAgent import WellAgent
+from .miscAgent import MiscAgent
 
 
 class AgentCoordinator:
@@ -28,6 +29,7 @@ class AgentCoordinator:
         self.road_connector_agent = RoadConnectorAgent(blueprint=blueprint, 
                                                        max_width=3, 
                                                        max_slope=1)
+        border_size = 2
 
         self.housing_agent = HousingAgent(blueprint=blueprint, 
                                           road_connector_agent=self.road_connector_agent, 
@@ -36,7 +38,7 @@ class AgentCoordinator:
                                           max_slope=2,
                                           max_plots=100,
                                           outside_walls=False,
-                                          border=1,
+                                          border=border_size,
                                           sizes = list(set([(h, w)
                                             for h in range(11, 17 + 1)
                                             for w in range(11,  20 + 1)]) | 
@@ -51,7 +53,7 @@ class AgentCoordinator:
                                           max_slope=2,
                                           max_plots=1,
                                           outside_walls=False,
-                                          border=1,
+                                          border=border_size,
                                           sizes = [(22, 21), (28, 22), (21, 22), (22, 28)])
         
         self.farm_agent = FarmAgent(blueprint=blueprint,  
@@ -61,7 +63,7 @@ class AgentCoordinator:
                                     max_slope=2,
                                     max_plots=5,
                                     outside_walls=True,
-                                    border=1,
+                                    border=border_size,
                                     sizes= [(h, w)
                                             for h in range(17, 26 + 1)
                                             for w in range(17,  26 + 1)])
@@ -72,7 +74,7 @@ class AgentCoordinator:
                                         max_slope=2,
                                         max_plots=1,
                                         outside_walls=False,
-                                        border=1,
+                                        border=border_size,
                                         sizes=[(21, 13), (28, 13), (13, 21), (13, 28)])
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
@@ -84,34 +86,43 @@ class AgentCoordinator:
                                         activation_step=0,
                                         priority=1,
                                         max_slope=2,
-                                        max_plots=2,
+                                        max_plots=1,
                                         outside_walls=False,
-                                        border=1,
+                                        border=border_size,
                                         sizes=[(15, 13), (20, 13), (25, 13), (13, 15), (13, 20), (13, 25)])
         self.decoration_agent = DecorationAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
-                                        priority=0,
+                                        priority=1,
                                         max_slope=2,
                                         max_plots=100,
                                         outside_walls=False,
-                                        border=1,
+                                        border=border_size,
                                         sizes=[(5,4), (4,5)])
         self.well_agent = WellAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
-                                        priority=0,
+                                        priority=1,
                                         max_slope=2,
                                         max_plots=2,
                                         outside_walls=False,
-                                        border=1,
+                                        border=border_size,
                                         sizes=[(7,7)])
+        self.misc_agent = MiscAgent(blueprint=blueprint,
+                                        road_connector_agent=self.road_connector_agent,
+                                        activation_step=5,
+                                        priority=1,
+                                        max_slope=2,
+                                        max_plots=3,
+                                        outside_walls=False,
+                                        border=border_size,
+                                        sizes=[(12,9),(9,12)])
 
         self.road_connector_agent.place([[begin[0]  + step_size // 2, begin[1] + step_size // 2]])
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent]:
+        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]:
             if agent.activation_step <= self.timestep and agent.plots_left != 0:
                 self.active_agents.append(agent)
 

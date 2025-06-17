@@ -7,6 +7,26 @@ from pyglm.glm import ivec3
 import numpy.typing as npt
 
 def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str):
+    nw_corner_coordinate, se_corner_coordinate = find_corner_coordinates(editor, tile_array, tile_size)
+    
+    rot, length, width, x_length, z_length = get_roof_rotation(nw_corner_coordinate, se_corner_coordinate)
+    
+
+    target_box = Box(nw_corner_coordinate, (x_length, width//2+1, z_length))
+    with editor.pushTransform(rotatedBoxTransform(target_box, rot)):
+        generic_wooden_roof(editor, length, width, wood_type)
+
+def build_brick_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str):
+    nw_corner_coordinate, se_corner_coordinate = find_corner_coordinates(editor, tile_array, tile_size)
+    
+    rot, length, width, x_length, z_length = get_roof_rotation(nw_corner_coordinate, se_corner_coordinate)
+    
+
+    target_box = Box(nw_corner_coordinate, (x_length, width//2+1, z_length))
+    with editor.pushTransform(rotatedBoxTransform(target_box, rot)):
+        generic_brick_roof(editor, length, width, wood_type)
+        
+def find_corner_coordinates(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3):
     build_area = editor.getBuildArea()
 
     for i in range(tile_array.shape[0]):
@@ -25,36 +45,29 @@ def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: i
 
     nw_corner_coordinate = ivec3(build_area.offset.x + nw_corner_tile.pos.x, nw_corner_tile.pos.y + tile_size.y-1, build_area.offset.z + nw_corner_tile.pos.z) 
     se_corner_coordinate = ivec3(build_area.offset.x + se_corner_tile.pos.x + tile_size.x, se_corner_tile.pos.y + tile_size.y-1, build_area.offset.z + se_corner_tile.pos.z + tile_size.z)
+    
+    return nw_corner_coordinate, se_corner_coordinate
 
-    eastwest_length = se_corner_coordinate.x - nw_corner_coordinate.x
-    northsouth_length = se_corner_coordinate.z - nw_corner_coordinate.z
+def get_roof_rotation(nw_corner: ivec3, se_corner: ivec3):
+    x_length = se_corner.x - nw_corner.x
+    z_length = se_corner.z - nw_corner.z
 
-    if eastwest_length > northsouth_length:
+    if x_length > z_length:
         roof_direction = "eastwest"
-    elif northsouth_length > eastwest_length:
+    elif z_length > x_length:
         roof_direction = "northsouth"
     else: 
         roof_direction = choice(["eastwest", "northsouth"])
     
     if roof_direction == "northsouth":
-        length = northsouth_length
-        width = eastwest_length
-        roof_rotation = 0
+        length = z_length
+        width = x_length
+        return 0, length, width, x_length, z_length
     else:
-        length = eastwest_length
-        width = northsouth_length
-        roof_rotation = 1
+        length = x_length
+        width = z_length
+        return 1, length, width, x_length, z_length
 
-    target_box = Box(nw_corner_coordinate, (eastwest_length, width//2+1, northsouth_length))
-    roof_type = choice([0,1])
-    with editor.pushTransform(rotatedBoxTransform(target_box, roof_rotation)):
-        match roof_type:
-            case 0:
-                generic_wooden_roof(editor, length, width, wood_type)
-            case 1:
-                generic_brick_roof(editor, length, width, wood_type)
-        
-     
 
 def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str):
     stairs_name = f"{wood_type}_stairs"

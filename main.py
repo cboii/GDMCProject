@@ -17,7 +17,7 @@ if __name__ == "__main__":
     step_size = 32
     gaussian = True
     radius = 2
-    border_size = 3
+    border_size = 2
 
     removeTrees(editor)
     mapFeatures = MapFeatureExtractor(editor)

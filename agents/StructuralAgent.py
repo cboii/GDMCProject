@@ -50,7 +50,7 @@ class StructuralAgent(Agent):
         mask_int = region_mask.astype(np.int32)
         rows, cols = mask_int.shape
 
-        sizes = [(h + 2 * self.border_size, w + 2 * self.border_size) for h,w in self.sizes]
+        sizes = [(h + 2 * border, w + 2 * border) for h,w in self.sizes]
         # sizes = [(h, w)
         #          for h in range(min_height, max_height + 1)
         #          for w in range(min_width,  max_width + 1)]
@@ -130,7 +130,7 @@ class StructuralAgent(Agent):
             region_mask = (labeled_array == label_id)
             region_size = np.sum(region_mask)
 
-            boxes.extend(self.__extract_boxes_and_borders(region_mask, border=1))
+            boxes.extend(self.__extract_boxes_and_borders(region_mask, border=border_size))
         
         if len(boxes) == 0:
             self.current_choice = None

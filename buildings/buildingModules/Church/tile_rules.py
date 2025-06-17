@@ -45,7 +45,7 @@ for name, rot_zero_dict in tile_directions_zero.items():
 
 tile_weights = {    "Church_Tower": 1,
                     "Church_Middle": 50,
-                    "Church_Altar" : 1,
+                    "Church_Altar" : 0.1,
                     "Air": 1}
 
 variation_weights = {}

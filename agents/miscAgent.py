@@ -5,11 +5,10 @@ from .bfs import BFS
 
 from .StructuralAgent import StructuralAgent
 from .plots import PlotType
-from buildings.buildingModules.Decoration.decoration import build_decoration
+from buildings.buildingModules.Misc.misc import build_misc, tile_sizes
 from gdpc.vector_tools import Rect
 
-
-class DecorationAgent(StructuralAgent):
+class MiscAgent(StructuralAgent):
 
     def __init__(self, 
                  blueprint,
@@ -31,18 +30,24 @@ class DecorationAgent(StructuralAgent):
                          border,
                          sizes)
         
-        self.type = PlotType.DECORATION
+        self.type = PlotType.MISC
 
     def evaluate(self, loc, border_size=3):
-        f = np.vectorize(self.blueprint.penalty)
-        n_build_map = np.ones(self.blueprint.map.shape)
-        n_traversable = n_build_map
-        path = BFS.find_minimal_path_to_network_numeric(n_traversable, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
+        traversable_n = self.blueprint.get_traversable_map(border_size)
+        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(path), path
+        return len(loc), path
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))
+        module = None
+        for m, ts in tile_sizes.items():
+            if (ts.x == area.size.x and ts.z == area.size.y) or (ts.x == area.size.y and ts.z == area.size.x):
+                module = m
+                self.sizes.remove((ts.x,ts.z))
+                self.sizes.remove((ts.z,ts.x))
+                break
+        
         wood_type = choice(["oak", "spruce"])
-        build_decoration(self.blueprint, area, wood_type=wood_type)
+        build_misc(self.blueprint, module, area, wood_type=wood_type)

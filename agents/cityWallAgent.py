@@ -54,7 +54,7 @@ class CityWallAgent(Agent):
         # self.blueprint.show()
 
         f = np.vectorize(self.penalty)
-        n_build_map = self.blueprint.steepness_map + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
+        n_build_map = 1 + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
         n_traversable = n_build_map
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
@@ -62,8 +62,8 @@ class CityWallAgent(Agent):
 
         if walls != None and last_segment != None:
             walls.extend(last_segment)
-            wall_coordinates = self.construct_wall(walls)
-            self.place(wall_coordinates)
+            #wall_coordinates = self.construct_wall(walls)
+            self.place(walls)
         else:
             return False
         
@@ -102,7 +102,7 @@ class CityWallAgent(Agent):
             start_node = coordinates[i]
             end_node = coordinates[i+1]
 
-            path_segment = BFS.find_minimal_path_to_network_numeric(n_mask, [start_node], [end_node])
+            path_segment = BFS.find_minimal_path_to_network_numeric(n_mask, [start_node], [end_node], use_start=True)
             if path_segment is None:
                 print(f"No path found between {start_node} and {end_node}")
                 return None

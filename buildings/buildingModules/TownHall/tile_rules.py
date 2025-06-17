@@ -66,8 +66,8 @@ tile_weights = {    "Townhall_Front_Left": 1,
                     "Townhall_Front_Right": 1,
                     "Townhall_Middle_Left": 50,
                     "Townhall_Middle_Right": 50,
-                    "Townhall_End_Left" : 1,
-                    "Townhall_End_Right" : 1,
+                    "Townhall_End_Left" : 0.1,
+                    "Townhall_End_Right" : 0.1,
                     "Air": 1}
 
 variation_weights = {"Townhall_Middle_Left": {"Townhall_Middle_Left#0": 1, "Townhall_Middle_Left#1": 1, "Townhall_Middle_Left#2": 1},

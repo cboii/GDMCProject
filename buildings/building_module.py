@@ -29,7 +29,7 @@ class BuildingModule:
     def place_module(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int):
         self.randomize_flowers()
         build_area = editor.getBuildArea()
-        target_box = Box(start+build_area.offset, tile_size)
+        target_box = Box((build_area.offset.x + start.x, start.y, build_area.offset.z + start.z), tile_size)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
                 editor.placeBlock(coords, block)

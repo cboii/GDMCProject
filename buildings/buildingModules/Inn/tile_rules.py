@@ -45,10 +45,10 @@ for name, rot_zero_dict in tile_directions_zero.items():
 
 tile_weights = {    "Inn_Front": 1,
                     "Inn_Middle": 50,
-                    "Inn_End" : 1,
+                    "Inn_End" : 0.1,
                     "Air": 1}
 
-variation_weights = {}
+variation_weights = {"Inn_Middle": {"Inn_Middle#0": 1, "Inn_Middle#1": 1, "Inn_Middle#2": 1}}
 
 
 tiles_possible_all = [  ("Inn_Front", ROT_NORTH), ("Inn_Front", ROT_EAST), ("Inn_Front", ROT_SOUTH), ("Inn_Front", ROT_WEST),

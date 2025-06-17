@@ -123,7 +123,7 @@ class BFS:
         return None
     
     @staticmethod
-    def find_minimal_path_to_network_numeric(mask, start, end, connectivity=8):
+    def find_minimal_path_to_network_numeric(mask, start, end, connectivity=8, use_start=False):
         if connectivity not in [4, 8]:
             raise ValueError("Connectivity must be 4 or 8.")
 
@@ -136,7 +136,10 @@ class BFS:
             x_cord = int(coord[0])
             y_cord = int(coord[1])
             coord = (x_cord, y_cord)
-            heapq.heappush(queue, (0, (coord, [coord])))
+            if use_start:
+                heapq.heappush(queue, (0, (coord, [coord])))
+            else:
+                heapq.heappush(queue, (0, (coord, [])))
             visited.add(coord)
 
         if connectivity == 4:

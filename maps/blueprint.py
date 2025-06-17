@@ -22,6 +22,7 @@ class Blueprint:
         self.church: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.decoration: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.well: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.misc: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.city_walls: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.town_hall: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.inn: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
@@ -39,21 +40,24 @@ class Blueprint:
                 case PlotType.HOUSE:
                     self.map[x, y] = 255
                     self.houses[x,y] = True
+                case PlotType.TOWNHALL:
+                    self.map[x,y]=175
+                    self.town_hall[x,y] = True
                 case PlotType.FARM:
                     self.map[x, y] = 150
-                    self.farms[x,y] = True
+                    self.farms[x,y] = True              
+                case PlotType.MISC:
+                    self.map[x,y]=130
+                    self.misc[x,y] = True
+                case PlotType.INN:
+                    self.map[x,y]=125
+                    self.inn[x,y] = True
                 case PlotType.DECORATION:
                     self.map[x, y] = 100
                     self.decoration[x,y] = True
                 case PlotType.WELL:
                     self.map[x, y] = 105
                     self.well[x,y] = True
-                case PlotType.TOWNHALL:
-                    self.map[x,y]=175
-                    self.town_hall[x,y] = True
-                case PlotType.INN:
-                    self.map[x,y]=125
-                    self.inn[x,y] = True
                 case PlotType.CHURCH:
                     self.map[x,y]=50
                     self.church[x,y] = True

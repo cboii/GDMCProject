@@ -13,3 +13,4 @@ class PlotType(Enum):
     INN = 9
     DECORATION = 10
     TREE = 11
+    MISC = 12
