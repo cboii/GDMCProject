@@ -29,5 +29,5 @@ def build_farm( blueprint: Blueprint, area: Rect,
     build_wooden_roof(editor, pb.tile_array, TILE_SIZE, wood_type)
     clean_up_foundation(editor, area, y, exceptions=["minecraft:spruce_trapdoor"])
     place_border(blueprint, area, y)
-    smooth_edges_gaussian(blueprint, area, sigma=3)
+    smooth_edges_gaussian(blueprint, area, sigma=7)
     editor.flushBuffer()

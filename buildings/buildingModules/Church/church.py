@@ -32,6 +32,6 @@ def build_church(   blueprint: Blueprint, area: Rect,
     editor.flushBuffer()
     clean_up_foundation(editor, area, y, exceptions=[])
     place_border(blueprint, area, y)
-    smooth_edges_gaussian(blueprint, area, sigma=3)
+    smooth_edges_gaussian(blueprint, area, sigma=7)
     editor.flushBuffer()
 

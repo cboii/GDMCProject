@@ -38,12 +38,13 @@ def clean_up_foundation(editor: Editor, area: Rect, ground: int, exceptions: lis
 def place_border(blueprint: Blueprint, area: Rect, ground: int, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     editor = blueprint.map_features.editor
     build_area = editor.getBuildArea()
-    bordered_area = Rect(area.offset - 1, area.size+2)
+    bordered_area = Rect(area.offset - 2, area.size+4)
     for x,z in bordered_area:
-        if blueprint.map[x,z] == 35:
+        if blueprint.map[x,z] <= 35:
             placeCuboid(editor, (build_area.offset.x + x, ground-1, build_area.offset.z + z), (build_area.offset.x + x, ground-10, build_area.offset.z + z), block)
+            placeCuboid(editor, (build_area.offset.x + x, ground, build_area.offset.z + z), (build_area.offset.x + x, ground+5, build_area.offset.z + z), Block("air"))
 
-def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, sigma: float, max_width: int = 7, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
+def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, sigma: float, max_width: int = 25, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     editor = blueprint.map_features.editor
     editor.flushBuffer()
     build_area = editor.getBuildArea()
@@ -69,16 +70,20 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, sigma: float, max_wi
     for x,z in smooth_area:
         if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and world_slice.getBlock((x,height_map[x,z]-1,z)).id != "minecraft:water":
             if include_area:
-                if blueprint.map[x,z] in [0,35] or Rect(area.offset-1, area.size+2).contains((x,z)):
+                if blueprint.map[x,z] <= 15 or Rect(area.offset-1, area.size+2).contains((x,z)):
                     placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), block)
-                    placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
+                    placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+20, build_area.offset.z + z), Block("air"))
             else:
-                if blueprint.map[x,z] in [0] and not Rect(area.offset, area.size).contains((x,z)):
+                if blueprint.map[x,z] <= 15 and not Rect(area.offset-2, area.size+4).contains((x,z)):
                     placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), block)
-                    placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
+                    placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+20, build_area.offset.z + z), Block("air"))
+                elif blueprint.map[x,z] <= 15 and not Rect(area.offset-1, area.size+2).contains((x,z)):
+                    if height_map_gaussian[x,z] < height_map[area.offset.x-1,area.offset.y-1]:
+                        placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), block)
+                        placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+20, build_area.offset.z + z), Block("air"))
             if blueprint.map[x,z] == 200:
                 placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z], build_area.offset.z + z), Block("cobblestone"))
-                placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
+                placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+20, build_area.offset.z + z), Block("air"))
 
     editor.flushBuffer()
 

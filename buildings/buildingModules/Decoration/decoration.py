@@ -31,5 +31,5 @@ def build_decoration( blueprint: Blueprint, area: Rect,
     build_module(editor, module, (area.offset.x, y, area.offset.y), tile_size, rot, wood_type)
 
     place_border(blueprint, area, y)
-    smooth_edges_gaussian(blueprint, area, sigma=3)
+    smooth_edges_gaussian(blueprint, area, sigma=7)
     editor.flushBuffer()
