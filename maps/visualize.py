@@ -24,8 +24,8 @@ def visualize_grid(map: Blueprint, step_size, gaussian=False, radius=1):
     axes[0].imshow(np.rot90(area), cmap='magma', interpolation='nearest', origin='lower')
     axes[0].set_title('Grid')
     axes[1].imshow(np.rot90(town_center[0]), cmap='magma', interpolation='nearest', origin='lower')
-    axes[1].set_title('Town Center District Location')
+    axes[1].set_title('Town Center')
     axes[2].imshow(np.rot90(subregion), cmap='magma', interpolation='nearest', origin='lower')
-    axes[2].set_title('Town Center District')
+    axes[2].set_title('Town Center Region')
 
     plt.show()

@@ -4,7 +4,6 @@ from maps.featureMaps import MapFeatureExtractor
 from maps.visualize import visualize_map_features, visualize_grid
 from terrain.terrain_manipulator import TerrainManipulator
 from maps.blueprint import Blueprint
-from agents.roadAgent import RoadExtendorAgent
 from agents.plots import PlotType
 from agents.housingAgent import HousingAgent
 from agents.coordinator import AgentCoordinator

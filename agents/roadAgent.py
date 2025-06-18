@@ -7,20 +7,6 @@ from .agentClass import Agent
 from .plots import PlotType
 import numpy as np
 
-class RoadExtendorAgent(Agent):
-
-    def __init__(self, blueprint, max_width, max_slope):
-        super().__init__(blueprint)
-        self.type = PlotType.ROAD
-        self.max_width = max_width
-        self.max_slope = max_slope
-
-    def place(self, loc):
-        super().place(loc)
-        pass
-
-
-
 class RoadConnectorAgent(Agent):
     def __init__(self, blueprint, max_width, max_slope):
         super().__init__(blueprint)
@@ -46,7 +32,7 @@ class RoadConnectorAgent(Agent):
 
             for dx, dy in movements:
                 neighbor_x, neighbor_y = x + dx, y + dy
-                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <=15:
+                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <=35:
                     road_coordinates.add((neighbor_x, neighbor_y))
         return list(road_coordinates)
     

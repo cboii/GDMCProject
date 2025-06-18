@@ -27,6 +27,7 @@ class Blueprint:
         self.town_hall: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.inn: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.outside_walls_area = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.border_size = 4
 
     def place(self, loc: np.ndarray, type: PlotType):
         for x, y in loc:
@@ -76,14 +77,14 @@ class Blueprint:
             return 10000
         return 0
 
-    def deactivate_border_region(self, matrix, border_size=3):
-        if not isinstance(border_size, int) or border_size < 0:
+    def deactivate_border_region(self, matrix):
+        if not isinstance(self.border_size, int) or self.border_size < 0:
             raise ValueError("--- border_size must be a non-negative integer ---")
 
         rows, cols = matrix.shape
         mask = np.zeros((rows, cols), dtype=bool)
 
-        effective_border_size = min(border_size, (rows + 1) // 2, (cols + 1) // 2)
+        effective_border_size = min(self.border_size, (rows + 1) // 2, (cols + 1) // 2)
 
         if effective_border_size == 0:
             return mask
@@ -96,9 +97,9 @@ class Blueprint:
         
         return mask
     
-    def get_traversable_map(self, border_size):
+    def get_traversable_map(self):
         penalty = np.vectorize(self.penalty)
-        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(self.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.map, border_size=border_size))
+        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(self.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.map))
         return traversable
     
     

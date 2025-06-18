@@ -29,22 +29,17 @@ class FarmAgent(StructuralAgent):
                          sizes)
         self.type = PlotType.FARM
 
-    def evaluate(self, loc, border_size=3):
-        build_map = self.blueprint.map <= 15
-        build_map &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
-        traversable = build_map
-        path = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.road_network)
+    def evaluate(self, loc):
+        traversable_n = self.blueprint.get_traversable_map()
+        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
-            traversable_n = self.blueprint.get_traversable_map(border_size)
-            path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
-            if path is None:
-                return -np.inf
+            return -np.inf
             
-        traversable = np.ones((self.blueprint.map.shape[0], self.blueprint.map.shape[1]), dtype=bool)
-        path_to_own = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.farms)
+        traversable = np.ones(self.blueprint.map.shape)
+        path_to_own = BFS.find_minimal_path_to_network_numeric(traversable, loc, [tuple(x) for x in np.argwhere(self.blueprint.farms)])
         if path_to_own is None:
-            return - len(path), path
-        return - len(path_to_own), path
+            return - len(path) - self.sum_steepness(loc), path
+        return - len(path_to_own) - self.sum_steepness(loc), path
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))

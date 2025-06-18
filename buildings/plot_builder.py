@@ -112,7 +112,7 @@ class PlotBuilder:
         for x in range(len(self.tile_array)):
             for y in range(len(self.tile_array[0])):
                 for z in range(len(self.tile_array[0,0])):
-                    print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
+                    # print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
                     self.tile_array[x,y,z].build(editor,variation_weights,wood_type)
 
     

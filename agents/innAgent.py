@@ -32,13 +32,6 @@ class InnAgent(StructuralAgent):
                          sizes)
         
         self.type = PlotType.INN
-
-    def evaluate(self, loc, border_size=3):
-        traversable_n = self.blueprint.get_traversable_map(border_size)
-        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
-        if path is None:
-            return -np.inf
-        return len(loc), path
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))

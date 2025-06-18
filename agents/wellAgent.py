@@ -34,13 +34,13 @@ class WellAgent(StructuralAgent):
         self.type = PlotType.WELL
 
     def evaluate(self, loc, border_size=3):
-        f = np.vectorize(self.blueprint.penalty)
-        n_build_map = np.ones(self.blueprint.map.shape)
+        penalty = np.vectorize(self.blueprint.penalty)
+        n_build_map = 1 + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map))
         n_traversable = n_build_map
         path = BFS.find_minimal_path_to_network_numeric(n_traversable, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(path), path
+        return - len(path) - self.sum_steepness(loc), path
     
     def build(self, loc, w, h):
         area = Rect((loc[0],loc[1]), (w,h))

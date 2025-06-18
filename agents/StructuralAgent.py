@@ -155,7 +155,7 @@ class StructuralAgent(Agent):
             offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
             offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
             
-            res = self.evaluate(offset_coords, border_size=border_size)
+            res = self.evaluate(offset_coords)
             if type(res) == float:
                 self.current_choice = None
                 self.current_path = None
@@ -192,12 +192,15 @@ class StructuralAgent(Agent):
         
         return mask
 
-    def evaluate(self, loc, border_size=3):
-        traversable_n = self.blueprint.get_traversable_map(border_size)
+    def sum_steepness(self, loc):
+        return sum([self.blueprint.steepness_map[tuple(l)] for l in loc])
+    
+    def evaluate(self, loc):
+        traversable_n = self.blueprint.get_traversable_map()
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(loc), path
+        return len(loc) - self.sum_steepness(loc), path
 
     def place(self):
         super().place(self.current_choice[0])
