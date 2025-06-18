@@ -31,7 +31,6 @@ class PlotBuilder:
          
 
     def create_tile_array(self):
-        print(f"Area: {self.area}")
         tile_array_size = ivec3(self.area.size.x // self.tile_size.x, self.floors, self.area.size.z // self.tile_size.z)
         tile_array_offset_x = (self.area.size.x - (tile_array_size.x * self.tile_size.x)) // 2
         tile_array_offset_z = (self.area.size.z - (tile_array_size.z * self.tile_size.z)) // 2
@@ -42,7 +41,6 @@ class PlotBuilder:
                                     for z in range(tile_array_size.z)] 
                                     for y in range(tile_array_size.y)] 
                                     for x in range(tile_array_size.x)], dtype=Tile)
-        print(f"tile array shape: {tile_array.shape}")
         
         for x in range(tile_array_size.x):
             for y in range(tile_array_size.y):
@@ -112,7 +110,7 @@ class PlotBuilder:
         for x in range(len(self.tile_array)):
             for y in range(len(self.tile_array[0])):
                 for z in range(len(self.tile_array[0,0])):
-                    print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
+                    #print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
                     self.tile_array[x,y,z].build(editor,variation_weights,wood_type)
 
     

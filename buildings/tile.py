@@ -84,9 +84,9 @@ class Tile:
             for modules in p_modules.values():
                 possible_for_tile_in_neighbor.update(modules[(dir+3)%6])
             possible_for_tile_per_neighbor.append(list(possible_for_tile_in_neighbor))
-        print(possible_for_tile_per_neighbor)
+        #print(possible_for_tile_per_neighbor)
         possible_for_tile = set(possible_for_tile_per_neighbor[0]).intersection(*possible_for_tile_per_neighbor)
-        print(f"Ppt: {possible_for_tile}")
+        #print(f"Ppt: {possible_for_tile}")
         
 
         previously_possible = self.possible_modules
@@ -98,11 +98,11 @@ class Tile:
 
         self.possible_modules = still_possible
         self.entropy = len(self.possible_modules)
-        print(list(self.possible_modules.keys())[0][0])
+        #print(list(self.possible_modules.keys())[0][0])
         if self.entropy == 1 and list(self.possible_modules.keys())[0][0] == "Air":
             self.entropy = 100
         self.updated = True
-        print(f"After update possible tiles: {list(self.possible_modules.keys())}")
+        #print(f"After update possible tiles: {list(self.possible_modules.keys())}")
         if len(previously_possible)-len(still_possible) > 0:
             for nb in self.neighbors.values():
                     nb.update(tile_quantity_limits)
@@ -129,7 +129,7 @@ class Tile:
     def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak"):
         build_area = editor.getBuildArea()
         pos_global = ivec3(build_area.offset.x + self.pos.x, self.pos.y, build_area.offset.z + self.pos.z)
-        print(f"Pos Global: {pos_global}")
+        #print(f"Pos Global: {pos_global}")
         module, rotation = self.selected_module
         if module in variation_weights.keys():
             if rotation == 4:

@@ -17,7 +17,6 @@ def build_wooden_house( blueprint: Blueprint, area: Rect,
     editor = blueprint.map_features.editor
     #smooth_edges_gaussian(blueprint, area, sigma=5, max_width=10, include_area=True)
     y = place_rect_foundation(editor, area, foundation_block)
-    print(f"y: {y}")
     house_area = Box((area.offset.x+1, y, area.offset.y+1),(area.size.x-2, y+TILE_SIZE.y*3, area.size.y-2))
     
     pb = PlotBuilder(house_area, 2, TILE_SIZE, tile_rules, tile_directions, tile_quantity_limits, tile_weights)
