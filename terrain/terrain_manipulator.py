@@ -38,7 +38,7 @@ class TerrainManipulator:
         area = vector_tools.Rect((loc[0],loc[1]), (w,h))
         smooth_edges_gaussian(self.blueprint, area, add=False, include_area=True)
         place_rect_foundation(self.blueprint.map_features.editor, vector_tools.Rect(area.offset-2, area.size+4), Block("grass_block"))
-        self.blueprint.map_features.reload_world_slice()
+        self.blueprint.map_features.editor.flushBuffer()
 
         
     def place_road_segment(self, loc):

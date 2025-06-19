@@ -29,9 +29,7 @@ def build_townhall( blueprint: Blueprint, area: Rect,
     pb.wfc(entrance_pos, ("Townhall_Front_Right", entrance_rotation))
     pb.build(editor, variation_weights, wood_type)
 
-    editor.flushBuffer()
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
     #clean_up_foundation(editor, area, y, exceptions=[])
-    #editor.flushBuffer()
 

@@ -146,8 +146,8 @@ class BFS:
             dr = [-1, 1, 0, 0]
             dc = [0, 0, -1, 1]
         else:
-            dr = [-1, -1, -1, 0, 0, 1, 1, 1]
-            dc = [-1, 0, 1, -1, 1, -1, 0, 1]
+            dr = [0, 1, -1, 0, -1, -1, 1, 1]
+            dc = [1, 0, 0, -1, -1, 1, -1, 1]
 
         terminate = False
         while queue and not terminate:

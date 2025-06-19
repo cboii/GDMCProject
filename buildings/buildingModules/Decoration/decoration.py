@@ -30,4 +30,3 @@ def build_decoration( blueprint: Blueprint, area: Rect,
 
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
-    editor.flushBuffer()

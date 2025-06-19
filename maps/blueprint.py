@@ -35,8 +35,9 @@ class Blueprint:
             y = int(y)
             match type:
                 case PlotType.ROAD:
-                    self.map[x, y] = 200
-                    self.road_network[x,y] = True
+                    if self.map[x,y] <= 35:
+                        self.map[x, y] = 200
+                        self.road_network[x,y] = True
                 case PlotType.HOUSE:
                     self.map[x, y] = 255
                     self.houses[x,y] = True

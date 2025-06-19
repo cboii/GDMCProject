@@ -29,4 +29,3 @@ def build_misc( blueprint: Blueprint, name: str, area: Rect,
 
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
-    editor.flushBuffer()

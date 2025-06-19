@@ -11,6 +11,7 @@ from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 from .wellAgent import WellAgent
 from .miscAgent import MiscAgent
+from buildings.base_foundation import smooth_edges_gaussian
 
 
 class AgentCoordinator:
@@ -93,7 +94,7 @@ class AgentCoordinator:
         self.decoration_agent = DecorationAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
-                                        priority=1,
+                                        priority=-1,
                                         max_slope=2,
                                         max_plots=100,
                                         outside_walls=False,
@@ -102,7 +103,7 @@ class AgentCoordinator:
         self.well_agent = WellAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
-                                        priority=1,
+                                        priority=0,
                                         max_slope=2,
                                         max_plots=2,
                                         outside_walls=False,
@@ -193,14 +194,16 @@ class AgentCoordinator:
             if execute:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
-                self.blueprint.reload_feature_maps()
+                #self.blueprint.reload_feature_maps()
             
-            chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
+            if not isinstance(chosen_agent, (DecorationAgent, WellAgent)):
+                chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
 
             if execute:
                 chosen_agent.build([chosen_agent.current_choice[0][0][0], chosen_agent.current_choice[0][0][1]], w, h)
+                self.blueprint.map_features.editor.flushBuffer()
                 self.blueprint.reload_feature_maps()
-
+            
         else:
             self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")
@@ -226,7 +229,7 @@ class AgentCoordinator:
             except CustomError as e:
                 print(e)
             print(f"--- Timestep: {self.timestep} ---")
-            
+        
         self.city_wall_agent.execute_wall_placement()
 
         self.blueprint.map_features.editor.flushBuffer() 

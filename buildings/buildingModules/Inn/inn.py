@@ -28,10 +28,8 @@ def build_inn(   blueprint: Blueprint, area: Rect,
     entrance_pos = get_entrance_pos_fixed(pb.tile_array, entrance_rotation, [0,0,0,0])
     pb.wfc(entrance_pos, ("Inn_Front", entrance_rotation))
     pb.build(editor, variation_weights, wood_type)
-
-    editor.flushBuffer()
+    
     clean_up_foundation(editor, area, y, exceptions=[])
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
-    editor.flushBuffer()
 

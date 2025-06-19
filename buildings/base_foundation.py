@@ -16,7 +16,7 @@ def place_rect_foundation(editor: Editor, area: Rect,
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
     world_slice = editor.loadWorldSlice(ws_rect)
     height_map = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]
-    y = int(np.median(height_map))
+    y = int(np.max(height_map))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-2, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-5, build_area.offset.z + area.offset.y+area.size.y-1), Block("dirt"))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-1, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-1, build_area.offset.z + area.offset.y+area.size.y-1), block)
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y+30, build_area.offset.z + area.offset.y+area.size.y-1), Block("air"))
@@ -42,7 +42,7 @@ def place_border(blueprint: Blueprint, area: Rect, ground: int, block: Union[Blo
             placeCuboid(editor, (build_area.offset.x + x, ground-1, build_area.offset.z + z), (build_area.offset.x + x, ground-10, build_area.offset.z + z), block)
             placeCuboid(editor, (build_area.offset.x + x, ground, build_area.offset.z + z), (build_area.offset.x + x, ground+5, build_area.offset.z + z), Block("air"))
 
-def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, sigma: float = 1, max_width: int = 10, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
+def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, sigma: float = 1, max_width: int = 15, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     editor = blueprint.map_features.editor
     editor.flushBuffer()
     build_area = editor.getBuildArea()
@@ -55,7 +55,7 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
         x_map = smooth_area.offset.x + x
         for z in range(0, smooth_area.size.y):
             z_map = smooth_area.offset.y + z
-            if blueprint.map[x_map,z_map] in [0,35] or (include_area and Rect(area.offset, area.size).contains((x_map,z_map))):
+            if blueprint.map[x_map,z_map] in [0, 15, 35, 200] or (include_area and Rect(area.offset, area.size).contains((x_map,z_map))):
                 height_map[x,z] = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"][x_map,z_map]-1
             else:
                 if x == 0 and z == 0:
@@ -66,25 +66,21 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
                     height_map[x,z] = height_map[x-1,z]
                 else:
                     height_map[x,z] = np.floor(0.5*(height_map[x-1,z] + height_map[x,z-1]))
-    print(height_map)
     height_map_gaussian = gaussian_filter(height_map, sigma=sigma)
-    print(height_map_gaussian)
 
     for x,z in smooth_area:
         if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and blueprint.ground_water_map[x,z] != 0:
             if include_area:
-                if blueprint.map[x,z] <= 15 or Rect(area.offset-1, area.size+2).contains((x,z)):
+                if blueprint.map[x,z] <= 15 or Rect(area.offset-2, area.size+4).contains((x,z)):
                     place_smoothed_blocks(editor, build_area, x, z, smooth_area.offset, height_map, height_map_gaussian, add, block)
             else:
-                if blueprint.map[x,z] <= 15 and not Rect(area.offset-2, area.size+4).contains((x,z)):
+                if blueprint.map[x,z] <= 15:
                     place_smoothed_blocks(editor, build_area, x, z, smooth_area.offset, height_map, height_map_gaussian, add, block)
-                elif blueprint.map[x,z] <= 15 and not Rect(area.offset-1, area.size+2).contains((x,z)):
-                    if height_map_gaussian[x,z] < height_map[area.offset.x-1,area.offset.y-1]:
+                elif blueprint.map[x,z] == 35:
+                    if height_map_gaussian[x - smooth_area.offset.x,z - smooth_area.offset.y] < height_map[area.offset.x - smooth_area.offset.x-1,area.offset.y - smooth_area.offset.y-1]:
                         place_smoothed_blocks(editor, build_area, x, z, smooth_area.offset, height_map, height_map_gaussian, add, block)
-            if blueprint.map[x,z] == 200 and not area.contains((x,z)):
+            if blueprint.map[x,z] == 200:
                 place_smoothed_blocks(editor, build_area, x, z, smooth_area.offset, height_map, height_map_gaussian, add, Block("cobblestone"))
-
-    editor.flushBuffer()
 
 def place_smoothed_blocks(editor: Editor, build_area, x: int, z: int, area_start: ivec2, height_map, height_map_gaussian, add: bool, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     

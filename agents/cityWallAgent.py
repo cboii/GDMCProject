@@ -59,7 +59,8 @@ class CityWallAgent(Agent):
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
         last_segment = self.connect_coordinates_in_order([tuple(area[hull.vertices[-1]]), tuple(area[hull.vertices[0]])], n_traversable)
-
+        #self.place([tuple(area[vertex]) for vertex in hull.vertices])
+        
         if walls != None and last_segment != None:
             walls.extend(last_segment)
             #wall_coordinates = self.construct_wall(walls)

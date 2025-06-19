@@ -13,13 +13,14 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    editor = Editor(buffering=True)
+    editor = Editor(buffering=True, caching=False, bufferLimit=1000000, cacheLimit=1000000)
     step_size = 32
     gaussian = True
     radius = 2
     border_size = 2
 
     removeTrees(editor)
+    editor.flushBuffer()
     mapFeatures = MapFeatureExtractor(editor)
     # visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
@@ -27,5 +28,5 @@ if __name__ == "__main__":
     
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(30, gaussian=gaussian, radius=radius, border_size=border_size)
+    coordinator.generate(40, gaussian=gaussian, radius=radius, border_size=border_size)
     blueprint.show()
