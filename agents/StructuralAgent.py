@@ -36,6 +36,8 @@ class StructuralAgent(Agent):
         self.border_size = border
         self.road_connection = road_connection
 
+        self.current_search_area = []
+
         self.outside_walls = outside_walls
 
         self.sizes = sizes
@@ -96,6 +98,10 @@ class StructuralAgent(Agent):
 
 
     def choose(self, search_area, gaussian=False, radius=1, border_size=3):
+        if search_area == self.current_search_area and self.current_choice is None:
+            raise NoneTypeChoice("--- No candidates found ---")
+        else:
+            self.current_search_area = search_area
         region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
         height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
         buildable_areas = steepness_map <= self.max_slope

@@ -12,7 +12,7 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    editor = Editor(buffering=True, bufferLimit=1000000, caching=True, cacheLimit=1000000)
+    editor = Editor(buffering=True, bufferLimit=1000000)
     step_size = 32
     gaussian = True
     radius = 2

@@ -99,7 +99,7 @@ class Blueprint:
     
     def get_traversable_map(self):
         penalty = np.vectorize(self.penalty)
-        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(self.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.map))
+        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.map >= 1, self.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.map))
         return traversable
     
     
