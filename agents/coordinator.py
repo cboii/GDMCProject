@@ -11,6 +11,7 @@ from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 from .wellAgent import WellAgent
 from .miscAgent import MiscAgent
+import random
 
 
 class AgentCoordinator:
@@ -34,7 +35,7 @@ class AgentCoordinator:
         self.housing_agent = HousingAgent(blueprint=blueprint, 
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
-                                          priority=0,
+                                          priority=1,
                                           max_slope=2,
                                           max_plots=100,
                                           outside_walls=False,
@@ -53,6 +54,7 @@ class AgentCoordinator:
                                           max_slope=2,
                                           max_plots=1,
                                           outside_walls=False,
+                                          inside_walls=True,
                                           border=border_size,
                                           sizes = [(22, 21), (28, 22), (21, 22), (22, 28)])
         
@@ -74,6 +76,7 @@ class AgentCoordinator:
                                         max_slope=2,
                                         max_plots=1,
                                         outside_walls=False,
+                                        inside_walls=True,
                                         border=border_size,
                                         sizes=[(21, 13), (28, 13), (13, 21), (13, 28)])
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
@@ -93,12 +96,14 @@ class AgentCoordinator:
         self.decoration_agent = DecorationAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
-                                        priority=1,
+                                        priority=0,
                                         max_slope=2,
                                         max_plots=100,
                                         outside_walls=False,
+                                        inside_walls=True,
                                         border=border_size,
-                                        sizes=[(5,4), (4,5)])
+                                        sizes=[(5,4), (4,5)],
+                                        road_connection=False)
         self.well_agent = WellAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=10,
@@ -122,7 +127,9 @@ class AgentCoordinator:
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]:
+        agents = [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]
+        random.shuffle(agents)
+        for agent in agents:
             if agent.activation_step <= self.timestep and agent.plots_left != 0:
                 self.active_agents.append(agent)
 
@@ -194,16 +201,17 @@ class AgentCoordinator:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
                 self.blueprint.reload_feature_maps()
-            
-            chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
 
             if execute:
                 chosen_agent.build([chosen_agent.current_choice[0][0][0], chosen_agent.current_choice[0][0][1]], w, h)
                 self.blueprint.reload_feature_maps()
+            if chosen_agent.road_connection:
+                chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
 
         else:
             self.expand_search_area(expansion)
             raise NoneTypeAgent("--- No agent available! ---")
+        self.blueprint.map_features.editor.flushBuffer()
 
     def generate(self, steps, gaussian=False, radius=1, border_size=3):
         
@@ -229,7 +237,7 @@ class AgentCoordinator:
             
         self.city_wall_agent.execute_wall_placement()
 
-        self.blueprint.map_features.editor.flushBuffer() 
+        self.blueprint.map_features # editor.flushBuffer() 
     
 class NoneTypeAgent(Exception):
     pass

@@ -11,29 +11,12 @@ from gdpc.vector_tools import Rect
 
 class WellAgent(StructuralAgent):
 
-    def __init__(self, 
-                 blueprint,
-                 road_connector_agent, 
-                 activation_step, 
-                 priority, 
-                 max_slope,
-                 max_plots,
-                 outside_walls,
-                 border=1,
-                 sizes=[]):
-        super().__init__(blueprint,
-                         road_connector_agent, 
-                         activation_step, 
-                         priority, 
-                         max_slope,
-                         max_plots,
-                         outside_walls,
-                         border,
-                         sizes)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         self.type = PlotType.WELL
 
-    def evaluate(self, loc, border_size=3):
+    def evaluate(self, loc):
         penalty = np.vectorize(self.blueprint.penalty)
         n_build_map = 1 + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.map >= 1).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map))
         n_traversable = n_build_map

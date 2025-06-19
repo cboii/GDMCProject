@@ -11,7 +11,7 @@ from scipy.ndimage import gaussian_filter
 def place_rect_foundation(editor: Editor, area: Rect,
                         block: Union[Block, Sequence[Block]]) -> int:
     print("Building foundation.")
-    editor.flushBuffer()
+    # editor.flushBuffer()
     build_area = editor.getBuildArea()
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
     print(ws_rect)
@@ -26,7 +26,7 @@ def place_rect_foundation(editor: Editor, area: Rect,
 
 def clean_up_foundation(editor: Editor, area: Rect, ground: int, exceptions: list, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     print("Cleaning up foundation.")
-    editor.flushBuffer()
+    # editor.flushBuffer()
     build_area = editor.getBuildArea()
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
     world_slice = editor.loadWorldSlice(ws_rect)
@@ -46,7 +46,7 @@ def place_border(blueprint: Blueprint, area: Rect, ground: int, block: Union[Blo
 
 def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, sigma: float = 1, max_width: int = 25, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     editor = blueprint.map_features.editor
-    editor.flushBuffer()
+    # editor.flushBuffer()
     build_area = editor.getBuildArea()
     world_slice = editor.loadWorldSlice()
     height_map = np.zeros((build_area.size.x, build_area.size.z))
@@ -63,7 +63,7 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
                     height_map[x,z] = height_map[x-1,z]
                 else:
                     height_map[x,z] = np.floor(0.5*(height_map[x-1,z] + height_map[x,z-1]))
-    height_map_gaussian = gaussian_filter(height_map, sigma=sigma)
+    height_map_gaussian = gaussian_filter(height_map, sigma=sigma,radius=2)
 
     smooth_area = Rect(area.offset-max_width, area.size + 2* max_width)
     
@@ -87,4 +87,4 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
                 placeCuboid(editor, (build_area.offset.x + x, height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+i, build_area.offset.z + z), Block("cobblestone"))
                 placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x,z]+1+i, build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x,z]+5, build_area.offset.z + z), Block("air"))
 
-    editor.flushBuffer()
+    # editor.flushBuffer()

@@ -38,4 +38,4 @@ def build_wooden_house( blueprint: Blueprint, area: Rect,
     clean_up_foundation(editor, area, y, [])
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
-    editor.flushBuffer()
+    # editor.flushBuffer()

@@ -29,9 +29,9 @@ def build_church(   blueprint: Blueprint, area: Rect,
     pb.wfc(entrance_pos, ("Church_Tower", entrance_rotation))
     pb.build(editor, variation_weights, wood_type)
 
-    editor.flushBuffer()
+    # editor.flushBuffer()
     clean_up_foundation(editor, area, y, exceptions=[])
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area, sigma=3)
-    editor.flushBuffer()
+    # editor.flushBuffer()
 

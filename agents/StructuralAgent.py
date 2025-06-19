@@ -22,8 +22,10 @@ class StructuralAgent(Agent):
                  max_slope,
                  max_plots,
                  outside_walls=False,
+                 inside_walls=None,
                  border=1,
-                 sizes=[]):
+                 sizes=[],
+                 road_connection=True):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
@@ -32,6 +34,7 @@ class StructuralAgent(Agent):
         self.current_choice = None
         self.current_path = None
         self.border_size = border
+        self.road_connection = road_connection
 
         self.outside_walls = outside_walls
 
@@ -41,6 +44,7 @@ class StructuralAgent(Agent):
         self.plots_left = max_plots
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
+        self.inside_walls = inside_walls
         # print(self.sizes)
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
@@ -107,6 +111,11 @@ class StructuralAgent(Agent):
             self.current_choice = None
             self.current_path = None
             raise NoneTypeChoice("--- No city walls placed yet ---")
+        
+        if self.inside_walls and self.blueprint.outside_walls_area.any():
+            print(f"--- Wall restriction active for agent of type {self.type.name} ---")
+            build_mask = np.logical_and(build_mask, ~(self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
+
 
         labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
 
