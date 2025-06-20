@@ -4,6 +4,7 @@ from .featureMaps import MapFeatureExtractor
 from agents.plots import PlotType
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
+from gdpc.vector_tools import Rect
 
 class Blueprint:
     def __init__(self, map_features: MapFeatureExtractor = None):
@@ -14,6 +15,7 @@ class Blueprint:
         self.height_map = self.map_features.create_heightmap()
 
         self.map: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]))
+        self.plot_heights = np.zeros((self.height_map.shape[0],self.height_map.shape[1]))
         self.current_area: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.road_network: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.houses: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
@@ -26,7 +28,7 @@ class Blueprint:
         self.city_walls: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.town_hall: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
         self.inn: np.ndarray = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
-        self.outside_walls_area = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)
+        self.outside_walls_area = np.zeros((self.height_map.shape[0],self.height_map.shape[1]), dtype=bool)     
 
     def place(self, loc: np.ndarray, type: PlotType):
         for x, y in loc:
@@ -163,4 +165,8 @@ class Blueprint:
         self.height_map = self.map_features.create_heightmap()
         self.steepness_map = self.map_features.create_gradient_maps()[4]
         self.ground_water_map = self.map_features.create_groundwater_map()
+
+    def set_plot_height(self, plot: Rect, height: int):
+        for x,y in plot:
+            self.plot_heights[x,y] = height
         

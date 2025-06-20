@@ -8,9 +8,10 @@ from pyglm.glm import ivec3, ivec2
 from random import choices
 from scipy.ndimage import gaussian_filter
 
-def place_rect_foundation(editor: Editor, area: Rect,
+def place_rect_foundation(blueprint: Blueprint, area: Rect,
                         block: Union[Block, Sequence[Block]]) -> int:
     print("Building foundation.")
+    editor = blueprint.map_features.editor
     editor.flushBuffer()
     build_area = editor.getBuildArea()
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
@@ -20,10 +21,12 @@ def place_rect_foundation(editor: Editor, area: Rect,
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-2, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-5, build_area.offset.z + area.offset.y+area.size.y-1), Block("dirt"))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-1, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-1, build_area.offset.z + area.offset.y+area.size.y-1), block)
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y+30, build_area.offset.z + area.offset.y+area.size.y-1), Block("air"))
+    blueprint.set_plot_height(area, y-1)
     return y
 
-def clean_up_foundation(editor: Editor, area: Rect, ground: int, exceptions: list, block: Union[Block, Sequence[Block]] = Block("grass_block")):
+def clean_up_foundation(blueprint: Blueprint, area: Rect, ground: int, exceptions: list, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     print("Cleaning up foundation.")
+    editor = blueprint.map_features.editor
     editor.flushBuffer()
     build_area = editor.getBuildArea()
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
@@ -55,8 +58,10 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
         x_map = smooth_area.offset.x + x
         for z in range(0, smooth_area.size.y):
             z_map = smooth_area.offset.y + z
-            if blueprint.map[x_map,z_map] in [0, 15, 35, 200] or (include_area and Rect(area.offset, area.size).contains((x_map,z_map))):
+            if blueprint.map[x_map,z_map] in [0, 15, 35, 200] or (include_area and area.contains((x_map,z_map))):
                 height_map[x,z] = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"][x_map,z_map]-1
+            elif not area.contains((x_map,z_map)):
+                height_map[x,z] = blueprint.plot_heights[x_map, z_map]
             else:
                 if x == 0 and z == 0:
                     height_map[x,z] = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"][x_map,z_map]-1
