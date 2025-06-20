@@ -239,7 +239,7 @@ class AgentCoordinator:
         
         self.city_wall_agent.execute_wall_placement()
 
-        self.blueprint.map_features # editor.flushBuffer() 
+        self.blueprint.map_features.editor.flushBuffer() 
     
 class NoneTypeAgent(Exception):
     pass

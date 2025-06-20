@@ -54,7 +54,7 @@ class CityWallAgent(Agent):
         # self.blueprint.show()
 
         penalty = np.vectorize(self.penalty)
-        n_build_map = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 15, self.blueprint.map != 200)).astype(int)
+        n_build_map = penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 15, self.blueprint.map != 200)).astype(int)
         n_traversable = n_build_map
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
