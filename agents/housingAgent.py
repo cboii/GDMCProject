@@ -10,41 +10,22 @@ from gdpc.vector_tools import Rect
 
 class HousingAgent(StructuralAgent):
 
-    def __init__(self, blueprint,
-                 road_connector_agent, 
-                 activation_step, 
-                 priority, 
-                 max_slope,
-                 max_plots,
-                 outside_walls,
-                 border=1,
-                 sizes=[]):
-        super().__init__(blueprint, 
-                         road_connector_agent, 
-                         activation_step, priority, 
-                         max_slope,
-                         max_plots,
-                         outside_walls,
-                         border,
-                         sizes)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         self.type = PlotType.HOUSE
 
-    def evaluate(self, loc, border_size=3):
-        traversable = self.blueprint.map <= 15
-        traversable &= self.blueprint.steepness_map <= self.road_connector_agent.max_slope
-        path = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.road_network)
+    def evaluate(self, loc):
+        traversable_n = self.blueprint.get_traversable_map()
+        path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
-            traversable_n = self.blueprint.get_traversable_map(border_size)
-            path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
-            if path is None:
-                return -np.inf
+            return -np.inf
         
-        traversable = np.ones((self.blueprint.map.shape[0], self.blueprint.map.shape[1]), dtype=bool)
-        path_to_church = BFS.find_minimal_path_to_network_boolean(traversable, loc, self.blueprint.church)
+        traversable = np.ones(self.blueprint.map.shape)
+        path_to_church = BFS.find_minimal_path_to_network_numeric(traversable, loc, [tuple(x) for x in np.argwhere(self.blueprint.church)])
         if path_to_church is None:
-            return - len(path), path
-        return -len(path_to_church), path
+            return - len(path) - self.sum_steepness(loc), path
+        return -len(path_to_church) - self.sum_steepness(loc), path
     
     def build(self, loc, w, h):
         print(f"loc: {loc}, w: {w}, h:{h}")

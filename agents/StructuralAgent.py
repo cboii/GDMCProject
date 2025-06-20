@@ -22,8 +22,10 @@ class StructuralAgent(Agent):
                  max_slope,
                  max_plots,
                  outside_walls=False,
+                 inside_walls=None,
                  border=1,
-                 sizes=[]):
+                 sizes=[],
+                 road_connection=True):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
@@ -32,6 +34,9 @@ class StructuralAgent(Agent):
         self.current_choice = None
         self.current_path = None
         self.border_size = border
+        self.road_connection = road_connection
+
+        self.current_search_area = []
 
         self.outside_walls = outside_walls
 
@@ -41,6 +46,7 @@ class StructuralAgent(Agent):
         self.plots_left = max_plots
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
+        self.inside_walls = inside_walls
         # print(self.sizes)
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
@@ -92,6 +98,10 @@ class StructuralAgent(Agent):
 
 
     def choose(self, search_area, gaussian=False, radius=1, border_size=3):
+        if search_area == self.current_search_area and self.current_choice is None:
+            raise NoneTypeChoice("--- No candidates found ---")
+        else:
+            self.current_search_area = search_area
         region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
         height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
         buildable_areas = steepness_map <= self.max_slope
@@ -107,6 +117,11 @@ class StructuralAgent(Agent):
             self.current_choice = None
             self.current_path = None
             raise NoneTypeChoice("--- No city walls placed yet ---")
+        
+        if self.inside_walls and self.blueprint.outside_walls_area.any():
+            print(f"--- Wall restriction active for agent of type {self.type.name} ---")
+            build_mask = np.logical_and(build_mask, ~(self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
+
 
         labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
 
@@ -155,7 +170,7 @@ class StructuralAgent(Agent):
             offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
             offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
             
-            res = self.evaluate(offset_coords, border_size=border_size)
+            res = self.evaluate(offset_coords)
             if type(res) == float:
                 self.current_choice = None
                 self.current_path = None
@@ -192,12 +207,15 @@ class StructuralAgent(Agent):
         
         return mask
 
-    def evaluate(self, loc, border_size=3):
-        traversable_n = self.blueprint.get_traversable_map(border_size)
+    def sum_steepness(self, loc):
+        return sum([self.blueprint.steepness_map[tuple(l)] for l in loc])
+    
+    def evaluate(self, loc):
+        traversable_n = self.blueprint.get_traversable_map()
         path = BFS.find_minimal_path_to_network_numeric(traversable_n, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
             return -np.inf
-        return len(loc), path
+        return len(loc) - self.sum_steepness(loc), path
 
     def place(self):
         super().place(self.current_choice[0])

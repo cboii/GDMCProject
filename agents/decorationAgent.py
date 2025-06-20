@@ -11,25 +11,8 @@ from gdpc.vector_tools import Rect
 
 class DecorationAgent(StructuralAgent):
 
-    def __init__(self, 
-                 blueprint,
-                 road_connector_agent, 
-                 activation_step, 
-                 priority, 
-                 max_slope,
-                 max_plots,
-                 outside_walls,
-                 border=1,
-                 sizes=[]):
-        super().__init__(blueprint,
-                         road_connector_agent, 
-                         activation_step, 
-                         priority, 
-                         max_slope,
-                         max_plots,
-                         outside_walls,
-                         border,
-                         sizes)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         self.type = PlotType.DECORATION
 

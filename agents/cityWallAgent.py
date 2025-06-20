@@ -38,8 +38,8 @@ class CityWallAgent(Agent):
     def try_place(self):
         house_coordinates = np.argwhere(self.blueprint.map)
         area = []
-        for x_step in [0]:
-            for z_step in [0]:
+        for x_step in [-3,0,3]:
+            for z_step in [-3,0,3]:
                 for coord in house_coordinates:
                     if coord[0]+x_step > self.blueprint.map.shape[0] - 1 or coord[0]+x_step < 0 or coord[1]+z_step > self.blueprint.map.shape[1] - 1 or coord[1]+z_step < 0:
                         continue
@@ -53,8 +53,8 @@ class CityWallAgent(Agent):
 
         # self.blueprint.show()
 
-        f = np.vectorize(self.penalty)
-        n_build_map = 1 + f(self.blueprint.ground_water_map != 255).astype(int) + f(self.blueprint.map >= 1).astype(int)
+        penalty = np.vectorize(self.penalty)
+        n_build_map = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 15, self.blueprint.map != 200)).astype(int)
         n_traversable = n_build_map
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)

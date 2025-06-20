@@ -47,7 +47,7 @@ def place_border(blueprint: Blueprint, area: Rect, ground: int, block: Union[Blo
 
 def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, sigma: float = 1, max_width: int = 15, include_area: bool = False, block: Union[Block, Sequence[Block]] = Block("grass_block")):
     editor = blueprint.map_features.editor
-    editor.flushBuffer()
+    # editor.flushBuffer()
     build_area = editor.getBuildArea()
     world_slice = editor.loadWorldSlice()
     smooth_area_start = ivec2(max(0, area.offset.x - max_width), max(0, area.offset.y - max_width))

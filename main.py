@@ -4,7 +4,6 @@ from maps.featureMaps import MapFeatureExtractor
 from maps.visualize import visualize_map_features, visualize_grid
 from terrain.terrain_manipulator import TerrainManipulator
 from maps.blueprint import Blueprint
-from agents.roadAgent import RoadExtendorAgent
 from agents.plots import PlotType
 from agents.housingAgent import HousingAgent
 from agents.coordinator import AgentCoordinator
@@ -13,7 +12,7 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    editor = Editor(buffering=True, caching=False, bufferLimit=1000000, cacheLimit=1000000)
+    editor = Editor(buffering=True, bufferLimit=1000000)
     step_size = 32
     gaussian = True
     radius = 2
