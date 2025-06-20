@@ -47,6 +47,8 @@ class StructuralAgent(Agent):
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
         self.inside_walls = inside_walls
+
+        self.candidates: list = []
         # print(self.sizes)
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
@@ -100,92 +102,111 @@ class StructuralAgent(Agent):
     def choose(self, search_area, gaussian=False, radius=1, border_size=3):
         if search_area == self.current_search_area and self.current_choice is None:
             raise NoneTypeChoice("--- No candidates found ---")
-        else:
+
+        elif search_area != self.current_search_area:
             self.current_search_area = search_area
-        region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
-        height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
-        buildable_areas = steepness_map <= self.max_slope
-        buildable_areas &= ~(ground_water_map != 255)
+            self.candidates = []
+            region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
+            height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
+            buildable_areas = steepness_map <= self.max_slope
+            buildable_areas &= ~(ground_water_map != 255)
 
-        build_mask = np.logical_and(buildable_areas, (self.blueprint.map[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size] == 0))
-        build_mask &= ~(self.deactivate_border_region(build_mask, border_size=border_size))
+            build_mask = np.logical_and(buildable_areas, (self.blueprint.map[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size] == 0))
+            build_mask &= ~(self.deactivate_border_region(build_mask, border_size=border_size))
 
-        if self.outside_walls and self.blueprint.outside_walls_area.any():
-            print(f"--- Wall restriction active for agent of type {self.type.name} ---")
-            build_mask = np.logical_and(build_mask, (self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
-        elif (self.outside_walls):
-            self.current_choice = None
-            self.current_path = None
-            raise NoneTypeChoice("--- No city walls placed yet ---")
-        
-        if self.inside_walls and self.blueprint.outside_walls_area.any():
-            print(f"--- Wall restriction active for agent of type {self.type.name} ---")
-            build_mask = np.logical_and(build_mask, ~(self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
-
-
-        labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
-
-        sizes = ndimage.sum(labeled_array, labeled_array, range(num_features + 1))/range(num_features + 1)
-        mask = (sizes >= self.min_size)
-
-
-        filtered_labels = np.where(mask)[0]
-        result = np.copy(labeled_array)
-        result[~np.isin(result, filtered_labels)] = 0
-
-        max_label = num_features + 1 
-
-        boxes = []
-        region_sizes = []
-        for label_id in filtered_labels:
-            region_mask = (labeled_array == label_id)
-            region_size = np.sum(region_mask)
-            region_sizes.append(region_size)
-
-            region_mask = (labeled_array == label_id)
-            region_size = np.sum(region_mask)
-
-            boxes.extend(self.__extract_boxes_and_borders(region_mask, border=border_size))
-        
-        if len(boxes) == 0:
-            self.current_choice = None
-            self.current_path = None
-            raise NoneTypeChoice("--- No candidates found ---")
-        
-        max_score = -np.inf
-        for b in boxes:
-            result = np.copy(labeled_array)
-            result[~np.isin(result, filtered_labels)] = 0
-            sub_region = b[0]
-            border_mask = b[1]
-
-            if not np.sum(sub_region) < self.min_size:
-                result[sub_region] = max_label
-
-            area = result == max_label
-            area &= ~border_mask
-            indices = np.argwhere(area)
-            indices_borders = np.argwhere(border_mask)
-
-            offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
-            offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
-            
-            res = self.evaluate(offset_coords)
-            if type(res) == float:
+            if self.outside_walls and self.blueprint.outside_walls_area.any():
+                print(f"--- Wall restriction active for agent of type {self.type.name} ---")
+                build_mask = np.logical_and(build_mask, (self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
+            elif (self.outside_walls):
                 self.current_choice = None
                 self.current_path = None
-                raise NoValidPath("--- Cannot connect to road network ---")
-             
-            score, path = res
-            if score > max_score:
-                max_score = score
-                self.current_choice = [offset_coords, offset_coords_border]
-                self.current_path = path
+                raise NoneTypeChoice("--- No city walls placed yet ---")
             
-        if max_score == -np.inf:
+            if self.inside_walls and self.blueprint.outside_walls_area.any():
+                print(f"--- Wall restriction active for agent of type {self.type.name} ---")
+                build_mask = np.logical_and(build_mask, ~(self.blueprint.outside_walls_area[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size]))
+
+
+            labeled_array, num_features = label(build_mask, structure=[[0,1,0], [1,1,1], [0,1,0]])
+
+            sizes = ndimage.sum(labeled_array, labeled_array, range(num_features + 1))/range(num_features + 1)
+            mask = (sizes >= self.min_size)
+
+
+            filtered_labels = np.where(mask)[0]
+            result = np.copy(labeled_array)
+            result[~np.isin(result, filtered_labels)] = 0
+
+            max_label = num_features + 1 
+
+            boxes = []
+            region_sizes = []
+            for label_id in filtered_labels:
+                region_mask = (labeled_array == label_id)
+                region_size = np.sum(region_mask)
+                region_sizes.append(region_size)
+
+                region_mask = (labeled_array == label_id)
+                region_size = np.sum(region_mask)
+
+                boxes.extend(self.__extract_boxes_and_borders(region_mask, border=border_size))
+            
+            if len(boxes) == 0:
+                self.current_choice = None
+                self.current_path = None
+                raise NoneTypeChoice("--- No candidates found ---")
+            
+            max_score = -np.inf
+            for b in boxes:
+                result = np.copy(labeled_array)
+                result[~np.isin(result, filtered_labels)] = 0
+                sub_region = b[0]
+                border_mask = b[1]
+
+                if not np.sum(sub_region) < self.min_size:
+                    result[sub_region] = max_label
+
+                area = result == max_label
+                area &= ~border_mask
+                indices = np.argwhere(area)
+                indices_borders = np.argwhere(border_mask)
+
+                offset_coords = indices + np.array([search_area[0][0], search_area[0][1]])
+                offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
+                
+                self.candidates.append([list(offset_coords), list(offset_coords_border)])
+        
+        self.current_choice = None
+        self.current_path = None
+        if self.candidates != []:
+            removed = 0
+            max_score = -np.inf
+            index_candidate_to_remove = None
+            for i, candidate in enumerate(self.candidates):
+                valid = set(tuple(map(tuple, candidate[0]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map))))) and set(tuple(map(tuple, candidate[1]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map)))))
+                if valid == False:
+                    print("Not valid")
+                    continue
+
+                res = self.evaluate(candidate[0])
+                if type(res) == float:
+                    continue
+                    # raise NoValidPath("--- Cannot connect to road network ---")
+                score, path = res
+                if score > max_score:
+                    max_score = score
+                    self.current_choice = candidate
+                    self.current_path = path
+                    index_candidate_to_remove = i
+
+            if not index_candidate_to_remove is None:
+                print("Removed")
+                del self.candidates[index_candidate_to_remove]
+
+        else:
             self.current_choice = None
             self.current_path = None
-            raise NoValidPath("--- Cannot connect to road network ---") 
+            raise NoneTypeChoice("--- No candidates found ---") 
 
     def deactivate_border_region(self, matrix, border_size=3):
         if not isinstance(border_size, int) or border_size < 0:

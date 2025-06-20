@@ -165,7 +165,7 @@ class AgentCoordinator:
         self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
 
     
-    def step(self, expansion=32, execute=True, gaussian=False, radius=1, border_size=3):
+    def step(self, expansion=16, execute=True, gaussian=False, radius=1, border_size=3):
         self.timestep += 1
         self._update_active_agents()
         if len(self.active_agents) == 0:

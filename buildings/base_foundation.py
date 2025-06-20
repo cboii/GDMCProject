@@ -73,6 +73,10 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
                     height_map[x,z] = np.floor(0.5*(height_map[x-1,z] + height_map[x,z-1]))
     height_map_gaussian = gaussian_filter(height_map, sigma=sigma)
 
+    smooth_area = Rect(area.offset-max_width, area.size + 2* max_width)
+    
+    i = 1 if add else 0
+
     for x,z in smooth_area:
         if build_area.contains((build_area.offset.x + x, 60, build_area.offset.z + z)) and blueprint.ground_water_map[x,z] != 0:
             if include_area:
