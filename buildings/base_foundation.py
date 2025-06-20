@@ -63,7 +63,7 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
                     height_map[x,z] = height_map[x-1,z]
                 else:
                     height_map[x,z] = np.floor(0.5*(height_map[x-1,z] + height_map[x,z-1]))
-    height_map_gaussian = gaussian_filter(height_map, sigma=sigma,radius=2)
+    height_map_gaussian = gaussian_filter(height_map, sigma=sigma)
 
     smooth_area = Rect(area.offset-max_width, area.size + 2* max_width)
     

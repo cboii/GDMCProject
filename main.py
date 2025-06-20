@@ -19,6 +19,7 @@ if __name__ == "__main__":
     border_size = 2
 
     removeTrees(editor)
+    editor.flushBuffer()
     mapFeatures = MapFeatureExtractor(editor)
     # visualize_map_features(mapFeatures)
     blueprint = Blueprint(mapFeatures)
