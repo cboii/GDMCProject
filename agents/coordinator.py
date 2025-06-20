@@ -118,7 +118,7 @@ class AgentCoordinator:
                                         activation_step=5,
                                         priority=1,
                                         max_slope=2,
-                                        max_plots=3,
+                                        max_plots=1,
                                         outside_walls=False,
                                         border=border_size,
                                         sizes=[(12,9),(9,12)])
@@ -200,14 +200,15 @@ class AgentCoordinator:
             if execute:
                 w, h = [chosen_agent.current_choice[0][-1][0] - chosen_agent.current_choice[0][0][0] + 1, chosen_agent.current_choice[0][-1][1] - chosen_agent.current_choice[0][0][1] + 1]
                 chosen_agent.terrain_manipulator.place_base(chosen_agent.current_choice[0][0], w, h)
-                self.blueprint.reload_feature_maps()
+
+            if chosen_agent.road_connection:
+                chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
 
             if execute:
                 chosen_agent.build([chosen_agent.current_choice[0][0][0], chosen_agent.current_choice[0][0][1]], w, h)
                 self.blueprint.map_features.editor.flushBuffer()
                 self.blueprint.reload_feature_maps()
-            if chosen_agent.road_connection:
-                chosen_agent.road_connector_agent.connect_to_road_network([tuple(x) for x in chosen_agent.current_path], execute)
+            
 
         else:
             self.expand_search_area(expansion)
