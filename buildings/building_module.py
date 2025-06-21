@@ -94,9 +94,9 @@ def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec
 def main():
     editor = Editor(buffering=True)
     
-    name = "Decoration_Flowerbed#1"
+    name = "CityWall_Corner#0"
     scan_module(editor, name)
-    build_module_global(editor, name, (-78, -60, 32), (7,7,7), 0, "oak")
+    build_module_global(editor, name, (0, -60, -160), (5,7,5), 0, "oak")
     
     #build_module_global(editor, "Misc_Smithy#0", (-94, -60, 11), (13,16,5), 0, "oak")
     #editor.flushBuffer()

@@ -1,6 +1,9 @@
 from gdpc import Block
+from gdpc.geometry import placeCuboid
 from scipy.spatial import ConvexHull
 
+from buildings.buildingModules.CityWall.patterns import wall_patterns
+from buildings.building_module import build_module_global
 from maps.blueprint import Blueprint
 from terrain.terrain_manipulator import TerrainManipulator
 from .StructuralAgent import Agent
@@ -89,9 +92,33 @@ class CityWallAgent(Agent):
     
 
     def execute_wall_placement(self):
-        for l in np.argwhere(self.blueprint.city_walls):
-            for h in range(10):
-                self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] + h - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
+        editor = self.blueprint.map_features.editor
+        build_area = self.blueprint.map_features.build_area
+        wall_coords = []
+        for x,z in np.argwhere(self.blueprint.city_walls):
+            directions = ((-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1))
+            neighborhood = np.zeros((3,3), dtype=int)
+            
+            for i,j in directions:
+                if 0 <= x+i < self.blueprint.city_walls.shape[0] and 0 <= z+j < self.blueprint.city_walls.shape[1]:
+                    neighborhood[i+1,j+1] = self.blueprint.city_walls[x+i,z+j]
+                    wall_coords.append((x+i,z+j))
+            if neighborhood.sum() != 3:
+                print("No 2 neighbors")
+                continue
+            
+            for p,n in wall_patterns:
+                if np.equal(neighborhood, p).all():
+                    build_module_global(editor, f"CityWall_{n[0]}#0", (build_area.offset.x + x - 2, self.blueprint.height_map[x,z], build_area.offset.z + z - 2), 
+                                        (5,7,5), n[1], "oak", build_air=False)
+                    
+        wall_coords = list(set(wall_coords))
+        """
+        self.place(wall_coords)            
+        for x,z in np.argwhere(self.blueprint.city_walls & self.blueprint.road_network):
+            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+10, build_area.offset.z + z), Block("air"))
+        """
+
     
     def connect_coordinates_in_order(self, coordinates, n_mask: np.ndarray):
         if not coordinates:
