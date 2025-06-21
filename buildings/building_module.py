@@ -26,19 +26,23 @@ class BuildingModule:
         self.name = name
         self.blocks = blocks
 
-    def place_module(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int):
+    def place_module(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int, build_air: bool = True):
         self.randomize_flowers()
         build_area = editor.getBuildArea()
         target_box = Box((build_area.offset.x + start.x, start.y, build_area.offset.z + start.z), tile_size)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
+                if not build_air and block.id == "minecraft:air":
+                    continue
                 editor.placeBlock(coords, block)
             
-    def place_module_global(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int):
+    def place_module_global(self, editor: Editor, start: ivec3, tile_size: ivec3, rotation: int, build_air: bool = True):
         self.randomize_flowers()
         target_box = Box(start, tile_size)
         with editor.pushTransform(rotatedBoxTransform(target_box, rotation)):
             for coords, block in self.blocks.items():
+                if not build_air and block.id == "minecraft:air":
+                    continue
                 editor.placeBlock(coords, block)
 
     def change_wood_type(self, type: str):
