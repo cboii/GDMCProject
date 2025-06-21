@@ -81,15 +81,15 @@ def get_module_from_pkl(name: str):
         module = pickle.load(f)
     return module
 
-def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak"):
+def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", build_air: bool = True):
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
-    module.place_module(editor, start, tile_size, rotation)
+    module.place_module(editor, start, tile_size, rotation, build_air)
 
-def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak"):
+def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", build_air: bool = True):
     module = get_module_from_pkl(name)
     module.change_wood_type(wood_type)
-    module.place_module_global(editor, start, tile_size, rotation)
+    module.place_module_global(editor, start, tile_size, rotation, build_air)
 
 def main():
     editor = Editor(buffering=True)
