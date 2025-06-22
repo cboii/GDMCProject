@@ -18,7 +18,9 @@ class StructuralAgent(Agent):
     def __init__(self, 
                  blueprint,
                  road_connector_agent: RoadConnectorAgent, 
-                 activation_step, priority, 
+                 activation_step, 
+                 deactivation_step,
+                 priority, 
                  max_slope,
                  max_plots,
                  outside_walls=False,
@@ -29,6 +31,7 @@ class StructuralAgent(Agent):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
+        self.deactivation_step = deactivation_step
         self.priority = priority
         self.max_slope = max_slope
         self.current_choice = None

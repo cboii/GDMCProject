@@ -8,6 +8,7 @@ class Agent(ABC):
         self.type: PlotType
         self.blueprint = blueprint
         self.activation_step = 0
+        self.deactivation_step = 1000
 
     def place(self, loc: np.ndarray):
         self.blueprint.place(loc, self.type)

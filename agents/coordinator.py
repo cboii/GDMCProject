@@ -35,6 +35,7 @@ class AgentCoordinator:
         self.housing_agent = HousingAgent(blueprint=blueprint, 
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
+                                          deactivation_step=25,
                                           priority=1,
                                           max_slope=2,
                                           max_plots=100,
@@ -50,6 +51,7 @@ class AgentCoordinator:
         self.town_hall_agent = TownHallAgent(blueprint=blueprint, 
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
+                                          deactivation_step=25,
                                           priority=2,
                                           max_slope=2,
                                           max_plots=1,
@@ -61,6 +63,7 @@ class AgentCoordinator:
         self.farm_agent = FarmAgent(blueprint=blueprint,  
                                     road_connector_agent=self.road_connector_agent,
                                     activation_step=8,
+                                    deactivation_step=25,
                                     priority=1,
                                     max_slope=2,
                                     max_plots=5,
@@ -72,6 +75,7 @@ class AgentCoordinator:
         self.church_agent = ChurchAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
+                                        deactivation_step=25,
                                         priority=2,
                                         max_slope=2,
                                         max_plots=1,
@@ -81,12 +85,14 @@ class AgentCoordinator:
                                         sizes=[(21, 13), (28, 13), (13, 21), (13, 28)])
         self.city_wall_agent = CityWallAgent(blueprint=blueprint,
                                         activation_step=11,
+                                        deactivation_step=100,
                                         priority=3,
                                         max_slope=5,
                                         max_plots=1)
         self.inn_agent = InnAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
+                                        deactivation_step=25,
                                         priority=1,
                                         max_slope=2,
                                         max_plots=1,
@@ -95,7 +101,8 @@ class AgentCoordinator:
                                         sizes=[(15, 13), (20, 13), (25, 13), (13, 15), (13, 20), (13, 25)])
         self.decoration_agent = DecorationAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
-                                        activation_step=10,
+                                        activation_step=25,
+                                        deactivation_step=100,
                                         priority=-1,
                                         max_slope=2,
                                         max_plots=100,
@@ -106,7 +113,8 @@ class AgentCoordinator:
                                         road_connection=False)
         self.well_agent = WellAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
-                                        activation_step=10,
+                                        activation_step=25,
+                                        deactivation_step=100,
                                         priority=0,
                                         max_slope=2,
                                         max_plots=2,
@@ -116,6 +124,7 @@ class AgentCoordinator:
         self.misc_agent = MiscAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=5,
+                                        deactivation_step=25,
                                         priority=1,
                                         max_slope=2,
                                         max_plots=1,
@@ -130,7 +139,7 @@ class AgentCoordinator:
         agents = [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]
         random.shuffle(agents)
         for agent in agents:
-            if agent.activation_step <= self.timestep and agent.plots_left != 0:
+            if agent.activation_step <= self.timestep < agent.deactivation_step and agent.plots_left != 0:
                 self.active_agents.append(agent)
 
 
