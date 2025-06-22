@@ -193,9 +193,9 @@ class StructuralAgent(Agent):
                 
                 try:
                     e = self.candidates_eval[i][1]
-                    valid_candidate_eval = set(tuple(map(tuple, e))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map)))))
+                    valid_candidate_eval = set(tuple(map(tuple, e))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map > 35)))))
                 except Exception:
-                    valid_candidate = False
+                    valid_candidate_eval = False
                 
                 if valid_candidate_eval == False:
                     res = self.evaluate(candidate[0])
