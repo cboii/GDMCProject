@@ -83,7 +83,9 @@ class AgentCoordinator:
                                         activation_step=11,
                                         priority=3,
                                         max_slope=5,
-                                        max_plots=1)
+                                        max_plots=1,
+                                        road_connector_agent=self.road_connector_agent,
+                                        number_of_gates=3)
         self.inn_agent = InnAgent(blueprint=blueprint,
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
