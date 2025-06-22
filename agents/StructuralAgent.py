@@ -49,6 +49,7 @@ class StructuralAgent(Agent):
         self.inside_walls = inside_walls
 
         self.candidates: list = []
+        self.candidates_eval: list = []
         # print(self.sizes)
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
@@ -94,7 +95,6 @@ class StructuralAgent(Agent):
                     border_mask = rect_mask.copy()
 
                 matching_locs.append([rect_mask, border_mask])
-                # return rect_mask, border_mask
 
         return matching_locs
 
@@ -106,6 +106,7 @@ class StructuralAgent(Agent):
         elif search_area != self.current_search_area:
             self.current_search_area = search_area
             self.candidates = []
+            self.candidates_eval = []
             region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
             height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
             buildable_areas = steepness_map <= self.max_slope
@@ -175,23 +176,36 @@ class StructuralAgent(Agent):
                 offset_coords_border = indices_borders + np.array([search_area[0][0], search_area[0][1]])
                 
                 self.candidates.append([list(offset_coords), list(offset_coords_border)])
+                self.candidates_eval.append(self.evaluate(list(offset_coords)))
         
         self.current_choice = None
         self.current_path = None
         if self.candidates != []:
-            removed = 0
             max_score = -np.inf
             index_candidate_to_remove = None
+            indices_to_remove = []
             for i, candidate in enumerate(self.candidates):
-                valid = set(tuple(map(tuple, candidate[0]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map))))) and set(tuple(map(tuple, candidate[1]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map)))))
-                if valid == False:
-                    print("Not valid")
+                valid_candidate = set(tuple(map(tuple, candidate[0]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map))))) and set(tuple(map(tuple, candidate[1]))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map)))))
+                if valid_candidate == False:
+                    print("--- Candidate not valid ---")
+                    indices_to_remove.append(i)
                     continue
+                
+                try:
+                    e = self.candidates_eval[i][1]
+                    valid_candidate_eval = set(tuple(map(tuple, e))).isdisjoint(set(tuple(map(tuple, np.argwhere(self.blueprint.map > 35)))))
+                except Exception:
+                    valid_candidate_eval = False
+                
+                if valid_candidate_eval == False:
+                    res = self.evaluate(candidate[0])
+                    self.candidates_eval[i] = res
+                else:
+                    res = self.candidates_eval[i]
 
-                res = self.evaluate(candidate[0])
                 if type(res) == float:
+                    indices_to_remove.append(i)
                     continue
-                    # raise NoValidPath("--- Cannot connect to road network ---")
                 score, path = res
                 if score > max_score:
                     max_score = score
@@ -200,8 +214,11 @@ class StructuralAgent(Agent):
                     index_candidate_to_remove = i
 
             if not index_candidate_to_remove is None:
-                print("Removed")
-                del self.candidates[index_candidate_to_remove]
+                indices_to_remove.append(index_candidate_to_remove)
+            
+            for c, j in enumerate(sorted(indices_to_remove)):
+                del self.candidates[j - c]
+                del self.candidates_eval[j - c]
 
         else:
             self.current_choice = None
