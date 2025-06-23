@@ -159,7 +159,6 @@ class StructuralAgent(Agent):
                 self.current_choice = None
                 self.current_path = None
                 raise NoneTypeChoice("--- No candidates found ---")
-            
             max_score = -np.inf
             for b in boxes:
                 result = np.copy(labeled_array)
@@ -180,7 +179,7 @@ class StructuralAgent(Agent):
                 
                 self.candidates.append([list(offset_coords), list(offset_coords_border)])
                 self.candidates_eval.append(self.evaluate(list(offset_coords)))
-        
+        print(f"Number of Candidates: {len(self.candidates)}")
         self.current_choice = None
         self.current_path = None
         if self.candidates != []:

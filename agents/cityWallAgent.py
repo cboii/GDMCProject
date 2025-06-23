@@ -23,7 +23,7 @@ class CityWallAgent(Agent):
                  max_slope,
                  max_plots,
                  road_connector_agent: RoadConnectorAgent,
-                 number_of_gates: 2):
+                 number_of_gates):
         super().__init__(blueprint)
 
         self.activation_step = activation_step
@@ -82,8 +82,9 @@ class CityWallAgent(Agent):
             split = int((len(walls)-1)/self.number_of_gates)
             for i, w in enumerate(walls):
                 if i % split == 0:
-                    road_segments.append(self.road_connector_agent.construct_road([w], ignore_walls=True))
-                    self.road_connector_agent.place(self.road_connector_agent.construct_road([w], ignore_walls=True))
+                    new_road_segments = self.road_connector_agent.construct_road([w], ignore_walls=True)
+                    road_segments.append(new_road_segments)
+                    self.road_connector_agent.place(new_road_segments)
                     penalty = np.vectorize(self.penalty)
                     traversable = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 1, self.blueprint.map != 200)).astype(int) + penalty(self.blueprint.deactivate_border_region(self.blueprint.map)) + penalty(self.blueprint.outside_walls_area)
                     rn_copy = np.ones_like(self.blueprint.road_network, dtype=bool)
@@ -112,7 +113,7 @@ class CityWallAgent(Agent):
 
             for dx, dy in movements:
                 neighbor_x, neighbor_y = x + dx, y + dy
-                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <= 1:
+                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <= 35:
                     wall_coordinates.add((neighbor_x, neighbor_y))
 
         return list(wall_coordinates)
@@ -162,7 +163,9 @@ class CityWallAgent(Agent):
                 editor.placeBlockGlobal((build_area.offset.x + x, self.blueprint.height_map[x,z]+7, build_area.offset.z + z), Block("oak_planks"))
             else:
                 placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z]+7, build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+8, build_area.offset.z + z), Block("stone_bricks"))
-
+        
+        for x,z in np.argwhere(self.blueprint.city_walls & self.blueprint.road_network):
+            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+10, build_area.offset.z + z), Block("air"))
     
     def connect_coordinates_in_order(self, coordinates, n_mask: np.ndarray):
         if not coordinates:

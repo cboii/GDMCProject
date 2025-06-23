@@ -17,7 +17,7 @@ def place_rect_foundation(blueprint: Blueprint, area: Rect,
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
     world_slice = editor.loadWorldSlice(ws_rect)
     height_map = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]
-    y = int(np.max(height_map))
+    y = int(np.median(height_map))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-2, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-5, build_area.offset.z + area.offset.y+area.size.y-1), Block("dirt"))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-1, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-1, build_area.offset.z + area.offset.y+area.size.y-1), block)
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y+30, build_area.offset.z + area.offset.y+area.size.y-1), Block("air"))
@@ -51,7 +51,7 @@ def smooth_edges_gaussian(blueprint: Blueprint, area: Rect, add: bool = True, si
     build_area = editor.getBuildArea()
     world_slice = editor.loadWorldSlice()
     smooth_area_start = ivec2(max(0, area.offset.x - max_width), max(0, area.offset.y - max_width))
-    smooth_area_end = ivec2(min(build_area.size.x, area.end.x + max_width), min(build_area.size.z, area.end.y+max_width))
+    smooth_area_end = ivec2(min(build_area.size.x, area.last.x + max_width), min(build_area.size.z, area.last.y+max_width))
     smooth_area = Rect(smooth_area_start, smooth_area_end-smooth_area_start)
     height_map = np.zeros((smooth_area.size.x, smooth_area.size.y))
     for x in range(0, smooth_area.size.x):
@@ -94,6 +94,8 @@ def place_smoothed_blocks(editor: Editor, build_area, x: int, z: int, area_start
     x_map = x - area_start.x
     z_map = z - area_start.y
     i = 1 if add else 0
+    if abs(height_map[x_map,z_map] - height_map_gaussian[x_map,z_map]) > 3:
+        return
     placeCuboid(editor, (build_area.offset.x + x, height_map[x_map,z_map], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x_map,z_map]+i, build_area.offset.z + z), block)
     if height_map[x_map,z_map] > height_map_gaussian[x_map,z_map]+i:
         placeCuboid(editor, (build_area.offset.x + x, height_map_gaussian[x_map,z_map]+1+i, build_area.offset.z + z), (build_area.offset.x + x, height_map[x_map,z_map], build_area.offset.z + z), Block("air"))

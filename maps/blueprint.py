@@ -162,6 +162,7 @@ class Blueprint:
         pass
     
     def reload_feature_maps(self):
+        self.map_features.editor.flushBuffer()
         self.map_features.reload_world_slice()
         self.height_map = self.map_features.create_heightmap()
         self.steepness_map = self.map_features.create_gradient_maps()[4]
@@ -170,4 +171,14 @@ class Blueprint:
     def set_plot_height(self, plot: Rect, height: int):
         for x,y in plot:
             self.plot_heights[x,y] = height
+
+    def get_town_area(self) -> Rect:
+        x_coords, z_coords = self.map.nonzero()
         
+
+        min_x = x_coords.min()
+        max_x = x_coords.max()
+        min_z = z_coords.min()
+        max_z = z_coords.max()
+        
+        return Rect((min_x,min_z), (max_x - min_x + 1, max_z - min_z + 1))
