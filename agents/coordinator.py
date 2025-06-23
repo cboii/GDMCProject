@@ -11,6 +11,7 @@ from .decorationAgent import DecorationAgent
 from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 from .wellAgent import WellAgent
 from .miscAgent import MiscAgent
+from .treeAgent import TreeAgent
 from buildings.base_foundation import smooth_edges_gaussian
 import random
 
@@ -106,7 +107,7 @@ class AgentCoordinator:
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=25,
                                         deactivation_step=100,
-                                        priority=-1,
+                                        priority=0,
                                         max_slope=2,
                                         max_plots=100,
                                         outside_walls=False,
@@ -134,12 +135,24 @@ class AgentCoordinator:
                                         outside_walls=False,
                                         border=border_size,
                                         sizes=[(12,9),(9,12)])
+        self.tree_agent = TreeAgent(blueprint=blueprint,
+                                        road_connector_agent=self.road_connector_agent,
+                                        activation_step=25,
+                                        deactivation_step=100,
+                                        priority=0,
+                                        max_slope=2,
+                                        max_plots=100,
+                                        outside_walls=False,
+                                        inside_walls=False,
+                                        border=1,
+                                        sizes=[(3,3), (5,5), (10,10), (12,12)],
+                                        road_connection=False)
 
         self.road_connector_agent.place([[begin[0]  + step_size // 2, begin[1] + step_size // 2]])
 
     def _update_active_agents(self):
         self.active_agents.clear()
-        agents = [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]
+        agents = [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent, self.tree_agent]
         random.shuffle(agents)
         for agent in agents:
             if agent.activation_step <= self.timestep < agent.deactivation_step and agent.plots_left != 0:
@@ -231,7 +244,7 @@ class AgentCoordinator:
         
         city_walls_placed = False
         for i in range(steps):
-            if i >= steps * 1/2 and city_walls_placed == False:
+            if i >= steps * 1/4 and city_walls_placed == False:
                 success = self.city_wall_agent.try_place()
                 if success:
                     
@@ -249,7 +262,7 @@ class AgentCoordinator:
                 print(e)
             print(f"--- Timestep: {self.timestep} ---")
         smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=False, sigma=2)
-        smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=True, sigma=2)
+        #smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=True, sigma=2)
         self.blueprint.reload_feature_maps()
         self.city_wall_agent.execute_wall_placement()
 

@@ -17,7 +17,7 @@ def place_rect_foundation(blueprint: Blueprint, area: Rect,
     ws_rect = Rect((build_area.offset.x + area.offset.x, build_area.offset.z + area.offset.y), area.size)
     world_slice = editor.loadWorldSlice(ws_rect)
     height_map = world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]
-    y = int(np.median(height_map))
+    y = int(np.max(height_map))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-2, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-5, build_area.offset.z + area.offset.y+area.size.y-1), Block("dirt"))
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y-1, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y-1, build_area.offset.z + area.offset.y+area.size.y-1), block)
     placeCuboid(editor, (build_area.offset.x + area.offset.x, y, build_area.offset.z + area.offset.y), (build_area.offset.x + area.offset.x+area.size.x-1, y+30, build_area.offset.z + area.offset.y+area.size.y-1), Block("air"))
@@ -94,7 +94,7 @@ def place_smoothed_blocks(editor: Editor, build_area, x: int, z: int, area_start
     x_map = x - area_start.x
     z_map = z - area_start.y
     i = 1 if add else 0
-    if abs(height_map[x_map,z_map] - height_map_gaussian[x_map,z_map]) > 3:
+    if abs(height_map[x_map,z_map] - height_map_gaussian[x_map,z_map]) > 4:
         return
     placeCuboid(editor, (build_area.offset.x + x, height_map[x_map,z_map], build_area.offset.z + z), (build_area.offset.x + x, height_map_gaussian[x_map,z_map]+i, build_area.offset.z + z), block)
     if height_map[x_map,z_map] > height_map_gaussian[x_map,z_map]+i:

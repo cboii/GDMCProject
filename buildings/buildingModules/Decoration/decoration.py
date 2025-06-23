@@ -8,7 +8,8 @@ from gdpc.vector_tools import Rect
 from pyglm.glm import ivec3
 
 TILE_SIZE = ivec3(5,3,4)
-MODULES = ["Decoration_Bench#0", "Decoration_Campfire#0", "Decoration_Flowerbed#0", "Decoration_Flowerbed#1"]
+MODULES = ["Decoration_Bench#0", "Decoration_Campfire#0", "Decoration_Flowerbed#0", "Decoration_Flowerbed#1", "Decoration_Barrels#0",
+           "Decoration_Boulder#0", "Decoration_Logs#0", "Decoration_Scarecrow#0", "Decoration_Storage#0"]
 
 def build_decoration( blueprint: Blueprint, area: Rect,
                     foundation_block: Union[Block, Sequence[Block]] = Block("grass_block"), wood_type: str = "oak"):
