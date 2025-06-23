@@ -23,7 +23,7 @@ class RoadConnectorAgent(Agent):
         if execute:
             self.terrain_manipulator.place_road_segment(path)
 
-    def construct_road(self, road_coords):
+    def construct_road(self, road_coords, ignore_walls=False):
         road_coordinates = set(road_coords)
         
         for wc in road_coords:
@@ -32,7 +32,11 @@ class RoadConnectorAgent(Agent):
 
             for dx, dy in movements:
                 neighbor_x, neighbor_y = x + dx, y + dy
-                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <=35:
+                if ignore_walls:
+                    ignored = True
+                else:
+                    ignored = self.blueprint.map[neighbor_x, neighbor_y] != 15
+                if 0 <= neighbor_x < self.blueprint.map.shape[0] and 0 <= neighbor_y < self.blueprint.map.shape[1] and self.blueprint.map[neighbor_x, neighbor_y] <= 35 and ignored:
                     road_coordinates.add((neighbor_x, neighbor_y))
         return list(road_coordinates)
     

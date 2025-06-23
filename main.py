@@ -13,7 +13,7 @@ import numpy as np
 
 if __name__ == "__main__":
     editor = Editor(buffering=True, bufferLimit=1000000)
-    step_size = 32
+    step_size = 64
     gaussian = True
     radius = 2
     border_size = 2
@@ -27,5 +27,5 @@ if __name__ == "__main__":
     
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    coordinator.generate(40, gaussian=gaussian, radius=radius, border_size=border_size)
+    coordinator.generate(20, gaussian=gaussian, radius=radius, border_size=border_size)
     blueprint.show()

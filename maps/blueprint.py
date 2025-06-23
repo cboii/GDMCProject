@@ -102,7 +102,7 @@ class Blueprint:
     
     def get_traversable_map(self):
         penalty = np.vectorize(self.penalty)
-        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.map > 15, self.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.map))
+        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.map > 1, self.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.map))
         return traversable
     
     
@@ -133,7 +133,7 @@ class Blueprint:
                 z_start = j * step_size
                 z_end   = min(z_start + step_size, steepness_map.shape[1])
                 if np.any(ground_water_map[x_start:x_end, z_start:z_end] != 255):
-                    buildable_regions[i, j] = max_val
+                    buildable_regions[i, j] += max_val
 
         if gaussian:
             buildable_regions = gaussian_filter(buildable_regions, sigma=1, radius=radius)

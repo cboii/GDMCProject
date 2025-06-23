@@ -1,3 +1,4 @@
+from .roadAgent import RoadConnectorAgent
 from gdpc import Block
 from gdpc.geometry import placeCuboid
 from scipy.spatial import ConvexHull
@@ -20,7 +21,9 @@ class CityWallAgent(Agent):
                  deactivation_step,
                  priority, 
                  max_slope,
-                 max_plots):
+                 max_plots,
+                 road_connector_agent: RoadConnectorAgent,
+                 number_of_gates: 2):
         super().__init__(blueprint)
 
         self.activation_step = activation_step
@@ -35,6 +38,9 @@ class CityWallAgent(Agent):
         
         self.max_plots = max_plots
 
+        self.road_connector_agent = road_connector_agent
+        self.number_of_gates = number_of_gates
+
     def penalty(self, x):
         if x:
             return 10000
@@ -48,6 +54,8 @@ class CityWallAgent(Agent):
                 for coord in house_coordinates:
                     if coord[0]+x_step > self.blueprint.map.shape[0] - 1 or coord[0]+x_step < 0 or coord[1]+z_step > self.blueprint.map.shape[1] - 1 or coord[1]+z_step < 0:
                         continue
+                    if self.blueprint.ground_water_map[coord[0]+x_step,coord[1]+z_step] != 255:
+                        continue
                     area.append([coord[0]+x_step, coord[1]+z_step])
 
         area = np.array(area)
@@ -59,7 +67,7 @@ class CityWallAgent(Agent):
         # self.blueprint.show()
 
         penalty = np.vectorize(self.penalty)
-        n_build_map = penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 15, self.blueprint.map != 200)).astype(int)
+        n_build_map = penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 35, self.blueprint.map != 200)).astype(int)
         n_traversable = n_build_map
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
@@ -70,6 +78,23 @@ class CityWallAgent(Agent):
             walls.extend(last_segment)
             wall_coordinates = self.construct_wall(walls)
             self.place(wall_coordinates)
+            road_segments = []
+            split = int((len(walls)-1)/self.number_of_gates)
+            for i, w in enumerate(walls):
+                if i % split == 0:
+                    road_segments.append(self.road_connector_agent.construct_road([w], ignore_walls=True))
+                    self.road_connector_agent.place(self.road_connector_agent.construct_road([w], ignore_walls=True))
+                    penalty = np.vectorize(self.penalty)
+                    traversable = self.blueprint.steepness_map + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 1, self.blueprint.map != 200)).astype(int) + penalty(self.blueprint.deactivate_border_region(self.blueprint.map)) + penalty(self.blueprint.outside_walls_area)
+                    rn_copy = np.ones_like(self.blueprint.road_network, dtype=bool)
+                    for s in road_segments:
+                        for c in s:
+                            rn_copy[c] = False
+                    path = BFS.find_minimal_path_to_network_numeric(traversable, [w], [tuple(x) for x in np.argwhere(self.blueprint.road_network & rn_copy)])
+                    if path is None:
+                        continue
+                    self.road_connector_agent.connect_to_road_network(path, True)
+            self.blueprint.show()
         else:
             return False
         
