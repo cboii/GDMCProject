@@ -52,7 +52,7 @@ class BFS:
                 neighbor_node = (neighbor_r, neighbor_c)
                 if neighbor_node in visited:
                     continue
-                if 0 <= neighbor_r < rows and 0 <= neighbor_c < cols and mask[neighbor_node] <= 1001:
+                if 0 <= neighbor_r < rows and 0 <= neighbor_c < cols and mask[neighbor_node] <= 5000:
                     heapq.heappush(queue, (value + mask[neighbor_node] + 1, next(counter), (neighbor_node, current_path + [neighbor_node])))
         try:
             min_value_path_index = np.argmin(values)

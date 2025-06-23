@@ -182,9 +182,9 @@ class AgentCoordinator:
             ):
             try:
                 agent.choose(search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size)
-            except IndexError as e:
-                print(e)
-                continue
+            # except IndexError as e:
+            #     print(e)
+            #     continue
             except NoneTypeChoice as e:
                 print(e)
                 continue
@@ -241,7 +241,14 @@ class AgentCoordinator:
         
         self.city_wall_agent.execute_wall_placement()
 
-        self.blueprint.map_features.editor.flushBuffer() 
-    
+        self.blueprint.map_features.editor.flushBuffer()
+        info = {}
+        for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]:
+            info[agent.type.name] = {
+                "plots_left": agent.max_plots - agent.plots_left
+                }
+        info["blueprint"] = self.blueprint.map
+
+        return info    
 class NoneTypeAgent(Exception):
     pass
