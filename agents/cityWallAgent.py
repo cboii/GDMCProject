@@ -16,13 +16,15 @@ import cv2 as cv
 class CityWallAgent(Agent):
 
     def __init__(self, blueprint: Blueprint,
-                 activation_step, 
+                 activation_step,
+                 deactivation_step,
                  priority, 
                  max_slope,
                  max_plots):
         super().__init__(blueprint)
 
         self.activation_step = activation_step
+        self.deactivation_step = deactivation_step
         self.priority = priority
         
         self.max_slope = max_slope
