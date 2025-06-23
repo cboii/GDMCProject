@@ -1,4 +1,5 @@
 import itertools
+import math
 import numpy as np
 from .featureMaps import MapFeatureExtractor
 from agents.plots import PlotType
@@ -80,6 +81,14 @@ class Blueprint:
             return 10000
         return 0
 
+    def exp_penalty(self, x):
+        if x:
+            if x < 30:
+                return math.exp(x)
+            else:
+                return 10000
+        return 0
+
     def deactivate_border_region(self, matrix):
         if not isinstance(self.border_size, int) or self.border_size < 0:
             raise ValueError("--- border_size must be a non-negative integer ---")
@@ -102,7 +111,8 @@ class Blueprint:
     
     def get_traversable_map(self):
         penalty = np.vectorize(self.penalty)
-        traversable = self.steepness_map + penalty(self.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.map > 1, self.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.map))
+        exp_penalty = np.vectorize(self.exp_penalty)
+        traversable = exp_penalty(self.steepness_map) + penalty(self.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.map > 1, self.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.map))
         return traversable
     
     

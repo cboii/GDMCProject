@@ -1,4 +1,5 @@
 import random
+from matplotlib import pyplot as plt
 import numpy as np
 
 from .bfs import BFS
@@ -47,6 +48,7 @@ class StructuralAgent(Agent):
         self.min_size = np.min([h + 2*border for h,w in sizes]) * np.min([w + 2*border for h,w in sizes])
         print(self.min_size)
         self.plots_left = max_plots
+        self.max_plots = max_plots
         
         self.terrain_manipulator = TerrainManipulator(self.blueprint)
         self.inside_walls = inside_walls
@@ -160,6 +162,7 @@ class StructuralAgent(Agent):
                 self.current_path = None
                 raise NoneTypeChoice("--- No candidates found ---")
             max_score = -np.inf
+            tainted = np.zeros_like(labeled_array)
             for b in boxes:
                 result = np.copy(labeled_array)
                 result[~np.isin(result, filtered_labels)] = 0
@@ -171,6 +174,12 @@ class StructuralAgent(Agent):
 
                 area = result == max_label
                 area &= ~border_mask
+                if (np.any(np.logical_and(tainted,area))):
+                    continue
+                else:
+                    tainted |= area
+                    # plt.imshow(tainted)
+                    # plt.show()
                 indices = np.argwhere(area)
                 indices_borders = np.argwhere(border_mask)
 

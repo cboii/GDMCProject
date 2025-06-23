@@ -18,7 +18,8 @@ class DecorationAgent(StructuralAgent):
 
     def evaluate(self, loc):
         penalty = np.vectorize(self.blueprint.penalty)
-        n_build_map = 1 + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map >= 1, self.blueprint.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map))
+        exp_penalty = np.vectorize(self.blueprint.exp_penalty)
+        n_build_map = exp_penalty(self.blueprint.steepness_map) + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map >= 1, self.blueprint.map != 200)).astype(int) + penalty(self.deactivate_border_region(self.blueprint.map))
         n_traversable = n_build_map
         path = BFS.find_minimal_path_to_network_numeric(n_traversable, loc, [tuple(x) for x in np.argwhere(self.blueprint.road_network)])
         if path is None:
