@@ -24,7 +24,7 @@ def build_wooden_house( blueprint: Blueprint, area: Rect,
     entrance_pos = get_entrance_pos(pb.tile_array, entrance_rot)
     pb.wfc(entrance_pos, ("House_Wood_GF_Door", entrance_rot))
     pb.build(editor, variation_weights, wood_type)
-
+    clean_up_foundation(blueprint, area, y, [])
     roof_type = choice([0,1])
     match roof_type:
         case 0:
@@ -32,6 +32,5 @@ def build_wooden_house( blueprint: Blueprint, area: Rect,
         case 1:
             build_brick_roof(editor, pb.tile_array, TILE_SIZE, wood_type)
 
-    clean_up_foundation(blueprint, area, y, [])
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
