@@ -2,6 +2,7 @@ from gdpc import Editor, Block, geometry, vector_tools
 from maps.blueprint import Blueprint
 import numpy as np
 from buildings.base_foundation import smooth_edges_gaussian, place_rect_foundation
+from random import choice
 
 class TerrainManipulator:
     def __init__(self, blueprint: Blueprint):
@@ -41,5 +42,6 @@ class TerrainManipulator:
 
         
     def place_road_segment(self, loc):
+        road_blocks = 3*[Block("cobblestone")] + [Block("gravel"), Block("andesite"), Block("stone")]
         for l in loc:
-            self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), Block("cobblestone"))
+            self.blueprint.map_features.editor.placeBlock((self.blueprint.map_features.build_area.offset.x + int(l[0]), self.blueprint.height_map[int(l[0]), int(l[1])] - 1, self.blueprint.map_features.build_area.offset.z + int(l[1])), choice(road_blocks))
