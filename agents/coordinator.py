@@ -12,7 +12,7 @@ from .StructuralAgent import NoValidPath, NoneTypeChoice, StructuralAgent
 from .wellAgent import WellAgent
 from .miscAgent import MiscAgent
 from .treeAgent import TreeAgent
-from buildings.base_foundation import smooth_edges_gaussian
+from buildings.base_foundation import smooth_edges_gaussian, place_foliage
 import random
 
 
@@ -261,10 +261,12 @@ class AgentCoordinator:
             except CustomError as e:
                 print(e)
             print(f"--- Timestep: {self.timestep} ---")
-        smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=False, sigma=2)
+        town_area = self.blueprint.get_town_area()
+        smooth_edges_gaussian(self.blueprint, town_area, add=False, sigma=2)
         #smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=True, sigma=2)
         self.blueprint.reload_feature_maps()
         self.city_wall_agent.execute_wall_placement()
+        place_foliage(self.blueprint, town_area)
 
         self.blueprint.map_features.editor.flushBuffer()
         info = {}
