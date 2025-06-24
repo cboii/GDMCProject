@@ -119,54 +119,48 @@ class CityWallAgent(Agent):
 
         return list(wall_coordinates)
     
-    """
     def execute_wall_placement(self):
         editor = self.blueprint.map_features.editor
         build_area = self.blueprint.map_features.build_area
-        wall_coords = []
+        built_wall = np.zeros(self.blueprint.city_walls.shape, dtype=int)
+        directions = [(0, -1), (-1, 0), (1, 0), (0, 1)]
+        wall_blocks = 6*[Block("stone_bricks")]+2*[Block("stone")]+ [Block("mossy_stone_bricks"), Block("cracked_stone_bricks"), Block("cobblestone")]
         for x,z in np.argwhere(self.blueprint.city_walls):
-            directions = ((-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1))
-            neighborhood = np.zeros((3,3), dtype=int)
             
-            for i,j in directions:
-                if 0 <= x+i < self.blueprint.city_walls.shape[0] and 0 <= z+j < self.blueprint.city_walls.shape[1]:
-                    neighborhood[i+1,j+1] = self.blueprint.city_walls[x+i,z+j]
-                    wall_coords.append((x+i,z+j))
-            if neighborhood.sum() != 3:
-                print("No 2 neighbors")
-                continue
-            
-            for p,n in wall_patterns:
-                if np.equal(neighborhood, p).all():
-                    build_module_global(editor, f"CityWall_{n[0]}#0", (build_area.offset.x + x - 2, self.blueprint.height_map[x,z], build_area.offset.z + z - 2), 
-                                        (5,7,5), n[1], "oak", build_air=False)
-                    
-        wall_coords = list(set(wall_coords))
-        
-        self.place(wall_coords)            
-        for x,z in np.argwhere(self.blueprint.city_walls & self.blueprint.road_network):
-            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z]+1, build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+10, build_area.offset.z + z), Block("air"))
-        """
-    
-    def execute_wall_placement(self):
-        editor = self.blueprint.map_features.editor
-        build_area = self.blueprint.map_features.build_area
-        wall_coords = []
-        for x,z in np.argwhere(self.blueprint.city_walls):
-            directions = [(0, -1), (-1, 0), (1, 0), (0, 1)]
             neighborhood = np.zeros((3,3), dtype=int)
             for i,j in directions:
                 if 0 <= x+i < self.blueprint.city_walls.shape[0] and 0 <= z+j < self.blueprint.city_walls.shape[1]:
                     neighborhood[i+1,j+1] = self.blueprint.outside_walls_area[x+i, z+j]
-            
-            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+6, build_area.offset.z + z), Block("stone_bricks"))
-            if (neighborhood == 0).all():
-                editor.placeBlockGlobal((build_area.offset.x + x, self.blueprint.height_map[x,z]+7, build_area.offset.z + z), Block("oak_planks"))
-            else:
-                placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z]+7, build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+8, build_area.offset.z + z), Block("stone_bricks"))
+                else: 
+                 neighborhood[i+1,j+1] = 1
+            if not (neighborhood == 0).all():
+                placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+8, build_area.offset.z + z), wall_blocks)
+                built_wall[x,z] = self.blueprint.height_map[x,z]+8
+        for k in range(3):
+            indices_built = {}
+            for x,z in np.argwhere(self.blueprint.city_walls != built_wall.astype(bool)):
+                neighborhood = np.zeros((3,3), dtype=int)
+                for i,j in directions:
+                    if built_wall[x+i,z+j]:
+                        editor.placeBlock((build_area.offset.x + x, built_wall[x+i,z+j]-1, build_area.offset.z + z), Block("oak_planks"))
+                        if k == 0:
+                            match (i,j):
+                                case (0,-1):
+                                    block = Block("stone_brick_stairs",{"facing": "north", "half": "top"})
+                                case (-1,0):
+                                    block = Block("stone_brick_stairs",{"facing": "west", "half": "top"})
+                                case (1,0):
+                                    block = Block("stone_brick_stairs",{"facing": "east", "half": "top"})
+                                case (0,1):
+                                    block = Block("stone_brick_stairs",{"facing": "south", "half": "top"})
+                            editor.placeBlock((build_area.offset.x + x, built_wall[x+i,z+j]-2, build_area.offset.z + z), block)
+                        indices_built[(x,z)] = built_wall[x+i,z+j]
+                        break
+            for k,v in indices_built.items():
+                built_wall[k] = v
         
         for x,z in np.argwhere(self.blueprint.city_walls & self.blueprint.road_network):
-            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+10, build_area.offset.z + z), Block("air"))
+            placeCuboid(editor, (build_area.offset.x + x, self.blueprint.height_map[x,z], build_area.offset.z + z), (build_area.offset.x + x, self.blueprint.height_map[x,z]+3, build_area.offset.z + z), Block("air"))
     
     def connect_coordinates_in_order(self, coordinates, n_mask: np.ndarray):
         if not coordinates:
