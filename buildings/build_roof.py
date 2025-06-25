@@ -6,7 +6,7 @@ from random import choice
 from pyglm.glm import ivec3
 import numpy.typing as npt
 
-def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str):
+def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str, fill_block: str):
     nw_corner_coordinate, se_corner_coordinate = find_corner_coordinates(editor, tile_array, tile_size)
     
     rot, length, width, x_length, z_length = get_roof_rotation(nw_corner_coordinate, se_corner_coordinate)
@@ -14,9 +14,9 @@ def build_wooden_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: i
 
     target_box = Box(nw_corner_coordinate, (x_length, width//2+1, z_length))
     with editor.pushTransform(rotatedBoxTransform(target_box, rot)):
-        generic_wooden_roof(editor, length, width, wood_type)
+        generic_wooden_roof(editor, length, width, wood_type, fill_block)
 
-def build_brick_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str):
+def build_brick_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3, wood_type: str, fill_block: str):
     nw_corner_coordinate, se_corner_coordinate = find_corner_coordinates(editor, tile_array, tile_size)
     
     rot, length, width, x_length, z_length = get_roof_rotation(nw_corner_coordinate, se_corner_coordinate)
@@ -24,7 +24,7 @@ def build_brick_roof(editor: Editor, tile_array: npt.NDArray[any], tile_size: iv
 
     target_box = Box(nw_corner_coordinate, (x_length, width//2+1, z_length))
     with editor.pushTransform(rotatedBoxTransform(target_box, rot)):
-        generic_brick_roof(editor, length, width, wood_type)
+        generic_brick_roof(editor, length, width, wood_type, fill_block)
         
 def find_corner_coordinates(editor: Editor, tile_array: npt.NDArray[any], tile_size: ivec3):
     build_area = editor.getBuildArea()
@@ -69,7 +69,7 @@ def get_roof_rotation(nw_corner: ivec3, se_corner: ivec3):
         return 1, length, width, x_length, z_length
 
 
-def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str):
+def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str, fill_block: str):
     stairs_name = f"{wood_type}_stairs"
     planks_name = f"{wood_type}_planks"
     slab_name = f"{wood_type}_slab"
@@ -87,10 +87,10 @@ def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str)
         
         if i < width//2:
             if i % 2 == 1:
-                placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block(planks_name))
-                placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block(planks_name))
-                placeCuboid(editor, (i, 1, length-1), (i,1+i,length-1), Block(planks_name))
-                placeCuboid(editor, (width-1-i, 1, length-1), (width-1-i,1+i,length-1), Block(planks_name))
+                placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block(fill_block))
+                placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block(fill_block))
+                placeCuboid(editor, (i, 1, length-1), (i,1+i,length-1), Block(fill_block))
+                placeCuboid(editor, (width-1-i, 1, length-1), (width-1-i,1+i,length-1), Block(fill_block))
             else:
                 placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block(log_name))
                 placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block(log_name))
@@ -104,10 +104,10 @@ def generic_wooden_roof(editor: Editor, length: int, width: int, wood_type: str)
         elif width % 2 == 1:
             placeCuboid(editor, (width//2, i, -1), (width//2, i, length-1+1), Block(planks_name))
             placeCuboid(editor, (width//2, i+1, -1), (width//2, i+1, length-1+1), Block(slab_name))
-            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block(planks_name))
-            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block(planks_name))
+            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block(fill_block))
+            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block(fill_block))
 
-def generic_brick_roof(editor: Editor, length: int, width: int, wood_type: str):
+def generic_brick_roof(editor: Editor, length: int, width: int, wood_type: str, fill_block: str):
     stairs_name = f"{wood_type}_stairs"
     planks_name = f"{wood_type}_planks"
     slab_name = f"{wood_type}_slab"
@@ -125,10 +125,10 @@ def generic_brick_roof(editor: Editor, length: int, width: int, wood_type: str):
         
         if i < width//2:
             if i % 2 == 1:
-                placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block("white_concrete"))
-                placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block("white_concrete"))
-                placeCuboid(editor, (i, 1, length-1), (i,1+i,length-1), Block("white_concrete"))
-                placeCuboid(editor, (width-1-i, 1, length-1), (width-1-i,1+i,length-1), Block("white_concrete"))
+                placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block(fill_block))
+                placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block(fill_block))
+                placeCuboid(editor, (i, 1, length-1), (i,1+i,length-1), Block(fill_block))
+                placeCuboid(editor, (width-1-i, 1, length-1), (width-1-i,1+i,length-1), Block(fill_block))
             else:
                 placeCuboid(editor, (i, 1, 0), (i,1+i,0), Block(log_name))
                 placeCuboid(editor, (width-1-i, 1, 0), (width-1-i,1+i,0), Block(log_name))
@@ -142,6 +142,6 @@ def generic_brick_roof(editor: Editor, length: int, width: int, wood_type: str):
         elif width % 2 == 1:
             placeCuboid(editor, (width//2, i, -1), (width//2, i, length-1+1), Block("bricks"))
             placeCuboid(editor, (width//2, i+1, -1), (width//2, i+1, length-1+1), Block("brick_slab"))
-            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block("white_concrete"))
-            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block("white_concrete"))
+            placeCuboid(editor, (width//2, 1, 0), (width//2, i, 0), Block(fill_block))
+            placeCuboid(editor, (width//2, 1, length-1), (width//2, i, length-1), Block(fill_block))
     

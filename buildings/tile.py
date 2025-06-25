@@ -126,7 +126,7 @@ class Tile:
         for dir, nb in self.neighbors.items():
             nb.update(tile_quantity_limits)
 
-    def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak"):
+    def build(self, editor: Editor, variation_weights: dict, wood_type: str="oak", replace: dict = {}):
         build_area = editor.getBuildArea()
         pos_global = ivec3(build_area.offset.x + self.pos.x, self.pos.y, build_area.offset.z + self.pos.z)
         #print(f"Pos Global: {pos_global}")
@@ -139,4 +139,4 @@ class Tile:
             module_name = "Air"
         else:
             module_name = f"{module}#0"
-        build_module_global(editor, module_name, pos_global, self.size, rotation, wood_type)
+        build_module_global(editor, module_name, pos_global, self.size, rotation, wood_type, replace)

@@ -99,8 +99,8 @@ tile_weights = {    "House_Wood_Ceiling": 10,
                     "Air": 1}
 
 variation_weights = {   "House_Wood_Ceiling": {"House_Wood_Ceiling#0": 7, "House_Wood_Ceiling#1": 1, "House_Wood_Ceiling#3": 1},
-                        "House_Wood_GF_Wall" : {"House_Wood_GF_Wall#0": 2, "House_Wood_GF_Wall#1": 1, "House_Wood_GF_Wall#2": 2, "House_Wood_GF_Wall#3": 2, "House_Wood_GF_Wall#4": 2},
-                        "House_Wood_GF_Window" : {"House_Wood_GF_Window#0": 2, "House_Wood_GF_Window#1": 1, "House_Wood_GF_Window#2": 2, "House_Wood_GF_Window#3": 2, "House_Wood_GF_Window#4": 2},
+                        "House_Wood_GF_Wall" : {"House_Wood_GF_Wall#0": 3, "House_Wood_GF_Wall#1": 1, "House_Wood_GF_Wall#2": 2, "House_Wood_GF_Wall#3": 2, "House_Wood_GF_Wall#4": 2},
+                        "House_Wood_GF_Window" : {"House_Wood_GF_Window#0": 3, "House_Wood_GF_Window#1": 1, "House_Wood_GF_Window#2": 2, "House_Wood_GF_Window#3": 2, "House_Wood_GF_Window#4": 2},
                         "House_Wood_UF_Wall" : {"House_Wood_UF_Wall#0": 2, "House_Wood_UF_Wall#1": 2, "House_Wood_UF_Wall#2": 2, "House_Wood_UF_Wall#3": 2, "House_Wood_UF_Wall#4": 2, "House_Wood_UF_Wall#5": 5, "House_Wood_UF_Wall#6": 2, "House_Wood_UF_Wall#7": 2, "House_Wood_UF_Wall#8": 2, "House_Wood_UF_Wall#9": 2,},
                         "House_Wood_UF_Window" : {"House_Wood_UF_Window#0": 2, "House_Wood_UF_Window#2": 2, "House_Wood_UF_Window#3": 2, "House_Wood_UF_Window#4": 2},
                         "House_Wood_UF_Corner": {"House_Wood_UF_Corner#0": 4, "House_Wood_UF_Corner#1": 2, "House_Wood_UF_Corner#2": 2, "House_Wood_UF_Corner#3": 2}}

@@ -56,6 +56,13 @@ class BuildingModule:
                 flower = choice(FLOWER_VARIATIONS)
                 block.id = block.id.replace("dandelion", flower)
     
+    def replace_block(self, block_id: str, replacement_id: str):
+        block_id = f"minecraft:{block_id}"
+        replacement_id = f"minecraft:{replacement_id}"
+        for block in self.blocks.values():
+            if block.id == block_id:
+                block.id = replacement_id
+    
 
 def scan_module(editor: Editor, name: str):
      
@@ -81,13 +88,17 @@ def get_module_from_pkl(name: str):
         module = pickle.load(f)
     return module
 
-def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", build_air: bool = True):
+def build_module(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", replace: dict = {}, build_air: bool = True):
     module = get_module_from_pkl(name)
+    for block, replacement in replace.items():
+        module.replace_block(block, replacement)
     module.change_wood_type(wood_type)
     module.place_module(editor, start, tile_size, rotation, build_air)
 
-def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", build_air: bool = True):
+def build_module_global(editor: Editor, name: str, start: ivec3, tile_size: ivec3, rotation: int, wood_type: str="oak", replace: dict = {}, build_air: bool = True):
     module = get_module_from_pkl(name)
+    for block, replacement in replace.items():
+        module.replace_block(block, replacement)
     module.change_wood_type(wood_type)
     module.place_module_global(editor, start, tile_size, rotation, build_air)
 

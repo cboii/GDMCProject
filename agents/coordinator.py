@@ -45,9 +45,9 @@ class AgentCoordinator:
                                           border=border_size,
                                           sizes = list(set([(h, w)
                                             for h in range(11, 17 + 1)
-                                            for w in range(11,  20 + 1)]) | 
+                                            for w in range(11,  17 + 1)]) | 
                                             set([(h, w)
-                                            for h in range(11,  20 + 1)
+                                            for h in range(11,  17 + 1)
                                             for w in range(11, 17 + 1)])))
         
         self.town_hall_agent = TownHallAgent(blueprint=blueprint, 

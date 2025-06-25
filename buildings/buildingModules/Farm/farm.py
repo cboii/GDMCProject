@@ -24,7 +24,7 @@ def build_farm( blueprint: Blueprint, area: Rect,
     pb.wfc(entrance_pos, ("Farm_Wood_Door", entrance_rot))
     pb.build(editor, variation_weights, wood_type)
     
-    build_wooden_roof(editor, pb.tile_array, TILE_SIZE, wood_type)
+    build_wooden_roof(editor, pb.tile_array, TILE_SIZE, wood_type, f"{wood_type}_planks")
     clean_up_foundation(blueprint, area, y, exceptions=["minecraft:spruce_trapdoor"])
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)

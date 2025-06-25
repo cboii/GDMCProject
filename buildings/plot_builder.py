@@ -106,12 +106,12 @@ class PlotBuilder:
             self.tile_array[x,y,z].select(self.tile_quantity_limits,self.tile_weights)
         return self.tile_array
     
-    def build(self, editor: Editor, variation_weights: dict, wood_type: str ="oak"):
+    def build(self, editor: Editor, variation_weights: dict, wood_type: str ="oak", replace: dict = {}):
         for x in range(len(self.tile_array)):
             for y in range(len(self.tile_array[0])):
                 for z in range(len(self.tile_array[0,0])):
                     #print(f"Grid Pos: {tuple(self.tile_array[x,y,z].grid_pos)}, World Pos: {tuple(self.tile_array[x,y,z].pos)}, Module: {self.tile_array[x,y,z].selected_module}")
-                    self.tile_array[x,y,z].build(editor,variation_weights,wood_type)
+                    self.tile_array[x,y,z].build(editor,variation_weights,wood_type,replace)
 
     
     

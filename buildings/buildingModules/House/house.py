@@ -9,6 +9,8 @@ from gdpc import Block
 from gdpc.vector_tools import Rect, Box
 from random import choice
 
+
+
 def build_wooden_house( blueprint: Blueprint, area: Rect, 
                         foundation_block: Union[Block, Sequence[Block]] = Block("stone_bricks"), wood_type: str = "oak"):
     print("Building a house.")
@@ -23,14 +25,18 @@ def build_wooden_house( blueprint: Blueprint, area: Rect,
     entrance_rot = get_entrance_direction(area, blueprint.road_network)
     entrance_pos = get_entrance_pos(pb.tile_array, entrance_rot)
     pb.wfc(entrance_pos, ("House_Wood_GF_Door", entrance_rot))
-    pb.build(editor, variation_weights, wood_type)
+
+    wall_options = [f"{wood_type}_planks", "white_concrete", "bricks", "yellow_terracotta", "red_terracotta"]
+    wall_block = choice(wall_options)
+
+    pb.build(editor, variation_weights, wood_type, {"white_concrete": wall_block})
     clean_up_foundation(blueprint, area, y, [])
     roof_type = choice([0,1])
     match roof_type:
         case 0:
-            build_wooden_roof(editor, pb.tile_array, TILE_SIZE, wood_type)
+            build_wooden_roof(editor, pb.tile_array, TILE_SIZE, wood_type, wall_block)
         case 1:
-            build_brick_roof(editor, pb.tile_array, TILE_SIZE, wood_type)
+            build_brick_roof(editor, pb.tile_array, TILE_SIZE, wood_type, wall_block)
 
     place_border(blueprint, area, y)
     smooth_edges_gaussian(blueprint, area)
