@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from Error import CustomError
 from .townHallAgent import TownHallAgent
 from .cityWallAgent import CityWallAgent
@@ -54,7 +55,7 @@ class AgentCoordinator:
                                           road_connector_agent=self.road_connector_agent, 
                                           activation_step=0,
                                           deactivation_step=25,
-                                          priority=2,
+                                          priority=4,
                                           max_slope=2,
                                           max_plots=1,
                                           outside_walls=False,
@@ -66,7 +67,7 @@ class AgentCoordinator:
                                     road_connector_agent=self.road_connector_agent,
                                     activation_step=8,
                                     deactivation_step=25,
-                                    priority=1,
+                                    priority=2,
                                     max_slope=2,
                                     max_plots=5,
                                     outside_walls=True,
@@ -78,7 +79,7 @@ class AgentCoordinator:
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
                                         deactivation_step=25,
-                                        priority=2,
+                                        priority=3,
                                         max_slope=2,
                                         max_plots=1,
                                         outside_walls=False,
@@ -97,7 +98,7 @@ class AgentCoordinator:
                                         road_connector_agent=self.road_connector_agent,
                                         activation_step=0,
                                         deactivation_step=25,
-                                        priority=1,
+                                        priority=2,
                                         max_slope=2,
                                         max_plots=1,
                                         outside_walls=False,
@@ -190,7 +191,7 @@ class AgentCoordinator:
         self.max_coords = [self.max_coords[0] + expansion_right, self.max_coords[1] + expansion_top]
 
     
-    def step(self, expansion=16, execute=True, gaussian=False, radius=1, border_size=3):
+    def step(self, expansion=16, execute=True, gaussian=False, radius=1, border_size=3, walls_placed=False):
         self.timestep += 1
         self._update_active_agents()
         if len(self.active_agents) == 0:
@@ -204,7 +205,7 @@ class AgentCoordinator:
                 reverse=True
             ):
             try:
-                agent.choose(search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size)
+                agent.choose(search_area=(self.min_coords, self.max_coords), gaussian=gaussian, radius=radius, border_size=border_size, walls_placed=walls_placed)
             # except IndexError as e:
             #     print(e)
             #     continue
@@ -243,6 +244,7 @@ class AgentCoordinator:
     def generate(self, steps, gaussian=False, radius=1, border_size=3):
         
         city_walls_placed = False
+        walls_placed = False
         for i in range(steps):
             if i >= steps * 1/4 and city_walls_placed == False:
                 success = self.city_wall_agent.try_place()
@@ -250,9 +252,10 @@ class AgentCoordinator:
                     
                     print("--- City walls placed! ---")
                     city_walls_placed = True
+                    walls_placed = True
                     continue
             try:
-                self.step(gaussian=gaussian, radius=radius, border_size=border_size)
+                self.step(gaussian=gaussian, radius=radius, border_size=border_size, walls_placed=walls_placed)
             # except IndexError as e:
             #     print(e)
             #     break
@@ -261,6 +264,7 @@ class AgentCoordinator:
             except CustomError as e:
                 print(e)
             print(f"--- Timestep: {self.timestep} ---")
+            walls_placed = False
         town_area = self.blueprint.get_town_area()
         smooth_edges_gaussian(self.blueprint, town_area, add=False, sigma=2)
         #smooth_edges_gaussian(self.blueprint, self.blueprint.get_town_area(), add=True, sigma=2)
@@ -269,12 +273,14 @@ class AgentCoordinator:
         place_foliage(self.blueprint, town_area)
 
         self.blueprint.map_features.editor.flushBuffer()
-        info = {}
+        info = {"data": {}}
         for agent in [self.housing_agent, self.farm_agent, self.church_agent, self.town_hall_agent, self.inn_agent, self.decoration_agent, self.well_agent, self.misc_agent]:
-            info[agent.type.name] = {
-                "plots_left": agent.max_plots - agent.plots_left
+            info["data"][agent.type.name] = {
+                "number_of_plots": agent.max_plots - agent.plots_left
                 }
         info["blueprint"] = self.blueprint.map
+        info["water_map"] = self.blueprint.ground_water_map
+        info["biome"] = self.blueprint.map_features.editor.getBiome((int(self.blueprint.ground_water_map.shape[0]/2), self.blueprint.height_map[int(self.blueprint.ground_water_map.shape[0]/2), int(self.blueprint.ground_water_map.shape[1]/2)], int(self.blueprint.ground_water_map.shape[1]/2)))
 
         return info    
 class NoneTypeAgent(Exception):
