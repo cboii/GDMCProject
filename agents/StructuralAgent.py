@@ -28,7 +28,8 @@ class StructuralAgent(Agent):
                  inside_walls=None,
                  border=1,
                  sizes=[],
-                 road_connection=True):
+                 road_connection=True,
+                 walls_placed=False):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
@@ -55,7 +56,8 @@ class StructuralAgent(Agent):
 
         self.candidates: list = []
         self.candidates_eval: list = []
-        # print(self.sizes)
+
+        self.walls_placed = walls_placed
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
                                             border: int = 1
@@ -65,9 +67,6 @@ class StructuralAgent(Agent):
         rows, cols = mask_int.shape
 
         sizes = [(h + 2 * border, w + 2 * border) for h,w in self.sizes]
-        # sizes = [(h, w)
-        #          for h in range(min_height, max_height + 1)
-        #          for w in range(min_width,  max_width + 1)]
         random.shuffle(sizes)
 
         matching_locs = []
@@ -104,18 +103,19 @@ class StructuralAgent(Agent):
         return matching_locs
 
 
-    def choose(self, search_area, gaussian=False, radius=1, border_size=3):
-        if search_area == self.current_search_area and self.current_choice is None:
+    def choose(self, search_area, gaussian=False, radius=1, border_size=3, walls_placed=False):
+        if search_area == self.current_search_area and self.current_choice is None and walls_placed:
             raise NoneTypeChoice("--- No candidates found ---")
 
-        elif search_area != self.current_search_area:
+        else:
             self.current_search_area = search_area
             self.candidates = []
             self.candidates_eval = []
             region_size = max([(search_area[1][0]) - (search_area[0][0]) + 1, (search_area[1][1]) - (search_area[0][1]) + 1])
-            height_map, ground_water_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
+            height_map, ground_water_map, lava_map, steepness_map, subregion = self.blueprint.get_subregion((search_area[0][0], search_area[0][1]), region_size=region_size, gaussian=gaussian, radius=radius)
             buildable_areas = steepness_map <= self.max_slope
             buildable_areas &= ~(ground_water_map != 255)
+            buildable_areas &= ~(lava_map != 255)
 
             build_mask = np.logical_and(buildable_areas, (self.blueprint.map[(search_area[0][0]): (search_area[0][0]) + region_size, (search_area[0][1]): (search_area[0][1]) + region_size] == 0))
             build_mask &= ~(self.deactivate_border_region(build_mask, border_size=border_size))
