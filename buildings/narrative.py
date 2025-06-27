@@ -54,5 +54,26 @@ def find_lecterns_in_plot(blueprint: Blueprint, plot_area: Rect) -> list[ivec3]:
                 
     return lectern_coords, lectern_facing
 
+def find_wall_signs_in_plot(blueprint: Blueprint, plot_area: Rect) -> list[ivec3]:
+
+    match blueprint.map[plot_area.offset.x, plot_area.offset.y]:
+        case 175:
+            possible_heights =  [2]
+        case _:
+            return None
+    
+    editor = blueprint.map_features.editor
+    build_area = editor.getBuildArea()
+    sign_coords = []
+    sign_facing = []
+    for x,z in plot_area:
+        for y in possible_heights:
+            block = editor.getBlockGlobal((build_area.offset.x + x, blueprint.plot_heights[x,z]+1+y, build_area.offset.z + z))
+            if block.id.endswith("wall_sign"):
+                sign_coords.append(ivec3(build_area.offset.x + x,blueprint.plot_heights[x,z]+1+y,build_area.offset.z + z))
+                sign_facing.append(block.states["facing"])
+                
+    return sign_coords, sign_facing
+
                 
 
