@@ -52,26 +52,21 @@ class CityWallAgent(Agent):
                 for coord in house_coordinates:
                     if coord[0]+x_step > self.blueprint.map.shape[0] - 1 or coord[0]+x_step < 0 or coord[1]+z_step > self.blueprint.map.shape[1] - 1 or coord[1]+z_step < 0:
                         continue
-                    if self.blueprint.ground_water_map[coord[0]+x_step,coord[1]+z_step] != 255:
+                    if self.blueprint.ground_water_map[coord[0]+x_step,coord[1]+z_step] != 255 or self.blueprint.lava_map[coord[0]+x_step,coord[1]+z_step] != 255:
                         continue
                     area.append([coord[0]+x_step, coord[1]+z_step])
 
         area = np.array(area)
         hull = ConvexHull(area)
 
-        # for i, vertex in enumerate(hull.vertices):
-        #     self.place([area[vertex]])
-
-        # self.blueprint.show()
 
         penalty = np.vectorize(self.penalty)
         exp_penalty = np.vectorize(self.blueprint.exp_penalty)
-        n_build_map = exp_penalty(self.blueprint.steepness_map) + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 35, self.blueprint.map != 200)).astype(int)
+        n_build_map = exp_penalty(self.blueprint.steepness_map) + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.lava_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 35, self.blueprint.map != 200)).astype(int)
         n_traversable = n_build_map
 
         walls = self.connect_coordinates_in_order([tuple(area[vertex]) for vertex in hull.vertices], n_traversable)
         last_segment = self.connect_coordinates_in_order([tuple(area[hull.vertices[-1]]), tuple(area[hull.vertices[0]])], n_traversable)
-        #self.place([tuple(area[vertex]) for vertex in hull.vertices])
         
         if walls != None and last_segment != None:
             walls.extend(last_segment)
@@ -84,7 +79,7 @@ class CityWallAgent(Agent):
                     road_segments.append(self.road_connector_agent.construct_road([w], ignore_walls=True))
                     self.road_connector_agent.place(self.road_connector_agent.construct_road([w], ignore_walls=True))
                     penalty = np.vectorize(self.penalty)
-                    traversable = exp_penalty(self.blueprint.steepness_map) + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 1, self.blueprint.map != 200)).astype(int) + penalty(self.blueprint.deactivate_border_region(self.blueprint.map)) + penalty(self.blueprint.outside_walls_area)
+                    traversable = exp_penalty(self.blueprint.steepness_map) + penalty(self.blueprint.ground_water_map != 255).astype(int) + penalty(self.blueprint.lava_map != 255).astype(int) + penalty(np.logical_and(self.blueprint.map > 1, self.blueprint.map != 200)).astype(int) + penalty(self.blueprint.deactivate_border_region(self.blueprint.map)) + penalty(self.blueprint.outside_walls_area)
                     rn_copy = np.ones_like(self.blueprint.road_network, dtype=bool)
                     for s in road_segments:
                         for c in s:
@@ -93,7 +88,7 @@ class CityWallAgent(Agent):
                     if path is None:
                         continue
                     self.road_connector_agent.connect_to_road_network(path, True)
-            self.blueprint.show()
+            # self.blueprint.show()
         else:
             return False
         

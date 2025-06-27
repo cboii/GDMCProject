@@ -31,4 +31,5 @@ class HousingAgent(StructuralAgent):
         print(f"loc: {loc}, w: {w}, h:{h}")
         area = Rect((loc[0],loc[1]), (w,h))
         wood_type = choice(["oak", "spruce"])
+        self.blueprint.house_locs[f"house_{self.max_plots-self.plots_left}"] = Rect((loc[0],loc[1]), (w,h))
         build_wooden_house(self.blueprint, area, wood_type=wood_type)

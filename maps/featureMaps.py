@@ -49,6 +49,24 @@ class MapFeatureExtractor:
                         map[x,z] = 255
         
         return map
+    
+    def create_lava_map(self, first: Vec3iLike = None, last: Vec3iLike = None):
+        first, last, length, width = self._get_dimensions(first, last)
+        heightmap = self.world_slice.heightmaps["MOTION_BLOCKING_NO_LEAVES"]
+
+        map = np.full((length,width), fill_value=16)
+        
+        for x in range(0,length):
+            for z in range(0,width):
+                for i in range(0,6):
+                    if self.world_slice.getBlock((first[0]+x, heightmap[first[0]+x, first[2]+z]-1-i, first[2]+z)).id == "minecraft:lava":
+                        map[x,z] = i
+                        break
+                    else:
+                        # Set anything else to 255
+                        map[x,z] = 255
+        
+        return map
         
     def create_gradient_maps(self,  first: Vec3iLike = None, last: Vec3iLike = None):
         first, last, length, width = self._get_dimensions(first, last)
