@@ -56,7 +56,7 @@ class AgentCoordinator:
                                           activation_step=0,
                                           deactivation_step=25,
                                           priority=4,
-                                          max_slope=2,
+                                          max_slope=3,
                                           max_plots=1,
                                           outside_walls=False,
                                           inside_walls=True,
@@ -280,7 +280,7 @@ class AgentCoordinator:
                 }
         info["blueprint"] = self.blueprint.map
         info["water_map"] = self.blueprint.ground_water_map
-        info["biome"] = self.blueprint.map_features.editor.getBiome((int(self.blueprint.ground_water_map.shape[0]/2), self.blueprint.height_map[int(self.blueprint.ground_water_map.shape[0]/2), int(self.blueprint.ground_water_map.shape[1]/2)], int(self.blueprint.ground_water_map.shape[1]/2)))
+        info["biome"] = self.blueprint.map_features.world_slice.getPrimaryBiomeInChunk((int(self.blueprint.ground_water_map.shape[0]/2), self.blueprint.height_map[int(self.blueprint.ground_water_map.shape[0]/2), int(self.blueprint.ground_water_map.shape[1]/2)], int(self.blueprint.ground_water_map.shape[1]/2)))
 
         return info    
 class NoneTypeAgent(Exception):

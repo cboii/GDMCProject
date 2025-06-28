@@ -10,6 +10,7 @@ from agents.plots import PlotType
 from agents.housingAgent import HousingAgent
 from agents.coordinator import AgentCoordinator
 from buildings.building_module import BuildingModule
+from buildings.narrative import add_narrative
 import numpy as np
 from dotenv import load_dotenv
 from openAIClient import generate_settlement_story
@@ -47,4 +48,4 @@ if __name__ == "__main__":
             story_output_larger["houses_and_families"][i]["location"] = rect
 
         print(story_output_larger)
-
+        add_narrative(blueprint, story_output_larger)
