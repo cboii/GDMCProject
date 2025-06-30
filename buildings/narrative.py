@@ -100,12 +100,21 @@ def add_information_to_house(blueprint: Blueprint, area: Rect, n: int, name: str
 def add_chronicles_to_townhall(blueprint: Blueprint, story: dict):
     editor = blueprint.map_features.editor
     lectern_coords, lectern_facing = find_lecterns_in_plot_type(blueprint, PlotType.TOWNHALL)
+
+    town_book = create_city_chronicles(blueprint, story)
+    placeLectern(editor, lectern_coords[0], lectern_facing[0], town_book)
+
     for i in range(min(len(lectern_coords)-1, len(story["houses_and_families"]))):
         coords = lectern_coords[i+1]
         facing = lectern_facing[i+1]
         book = create_family_book(story["houses_and_families"][i])
         placeLectern(editor, coords, facing, book)
-    
+
+def create_city_chronicles(story):
+    title = choice(["Our Village", "Our Town", "Town Chronicles"])
+    text = story["settlement_story"]
+    return bookData(text, title)
+
 def create_family_book(story: dict) -> str:
     name = story["family_name"]
     house_number = story["house_number"]
