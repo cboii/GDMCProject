@@ -28,8 +28,7 @@ class StructuralAgent(Agent):
                  inside_walls=None,
                  border=1,
                  sizes=[],
-                 road_connection=True,
-                 walls_placed=False):
+                 road_connection=True):
         super().__init__(blueprint)
         self.road_connector_agent = road_connector_agent
         self.activation_step = activation_step
@@ -56,8 +55,6 @@ class StructuralAgent(Agent):
 
         self.candidates: list = []
         self.candidates_eval: list = []
-
-        self.walls_placed = walls_placed
 
     def __extract_boxes_and_borders(self, region_mask: np.ndarray,
                                             border: int = 1

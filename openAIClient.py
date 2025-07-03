@@ -38,6 +38,7 @@ def generate_settlement_story(settlement_data: dict) -> dict:
                 "The story should be inspired by the provided map image and settlement details."
                 "Adapt the story to match the available plot types, water map and plots placed." 
                 "Also consider the location of the plots from the provided images."
+                "The farms are purely vegetative, there are no animal farms."
                 "The image scales are 1:1, so one unit is equal to 1 block within the Minecraft world."
                 "The JSON output should have the following example structure: "
                 f'{example}'

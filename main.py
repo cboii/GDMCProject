@@ -28,9 +28,9 @@ if __name__ == "__main__":
     removeTrees(editor)
     editor.flushBuffer()
     mapFeatures = MapFeatureExtractor(editor)
-    visualize_map_features(mapFeatures)
+    visualize_map_features(mapFeatures, save=True)
     blueprint = Blueprint(mapFeatures)
-    visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
+    visualize_grid(blueprint, step_size=step_size, gaussian=gaussian, radius=radius, save=True)
     
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
