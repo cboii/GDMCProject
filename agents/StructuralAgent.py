@@ -101,7 +101,7 @@ class StructuralAgent(Agent):
 
 
     def choose(self, search_area, gaussian=False, radius=1, border_size=3, walls_placed=False):
-        if search_area == self.current_search_area and self.current_choice is None and walls_placed:
+        if search_area == self.current_search_area and self.current_choice is None and not walls_placed:
             raise NoneTypeChoice("--- No candidates found ---")
 
         else:
