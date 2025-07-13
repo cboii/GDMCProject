@@ -187,8 +187,8 @@ class Blueprint:
                        gaussian=False,
                        radius=1):
 
-        x_size = (self.steepness_map.shape[0] + step_size - 1) // step_size -1
-        z_size = (self.steepness_map.shape[1] + step_size - 1) // step_size -1
+        x_size = (self.steepness_map.shape[0]) // step_size
+        z_size = (self.steepness_map.shape[1]) // step_size
         buildable_regions = np.empty((x_size, z_size), dtype=float)
         penalty = np.vectorize(self.feature_map_penalty)
         for i in range(x_size):

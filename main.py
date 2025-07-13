@@ -34,7 +34,7 @@ if __name__ == "__main__":
     
     coordinator = AgentCoordinator(blueprint=blueprint, step_size=step_size, gaussian=gaussian, radius=radius)
 
-    info = coordinator.generate(50, gaussian=gaussian, radius=radius, border_size=border_size)
+    info = coordinator.generate(40, gaussian=gaussian, radius=radius, border_size=border_size)
     blueprint.show(save=True)
     blueprint.save_water_map()
     print(info)
