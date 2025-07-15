@@ -103,12 +103,12 @@ class Blueprint:
 
         im = ax.imshow(rotated_image, interpolation='nearest', origin='lower',
                         vmin=0, vmax=255)
-        cbar = fig.colorbar(im, ax=ax, orientation='vertical', shrink=0.8)
+        # cbar = fig.colorbar(im, ax=ax, orientation='vertical', shrink=0.8)
 
-        cbar.set_label('Pixel Value (Intensity)', fontsize=12)
+        # cbar.set_label('Pixel Value (Intensity)', fontsize=12)
 
-        cbar.set_ticks(legend_values)
-        cbar.set_ticklabels(legend_labels, fontsize=10)
+        # cbar.set_ticks(legend_values)
+        # cbar.set_ticklabels(legend_labels, fontsize=10)
         if save:
             plt.savefig("blueprint")
         plt.show()

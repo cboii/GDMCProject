@@ -6,13 +6,15 @@ from skimage import data, segmentation, color
 from skimage import graph
 
 def visualize_map_features(map_features: MapFeatureExtractor, save=False):
-    f, axes = plt.subplots(1, 3, figsize=(18, 6))
+    f, axes = plt.subplots(1, 4, figsize=(18, 6))
     axes[0].imshow(np.rot90(map_features.create_heightmap()), cmap='magma', interpolation='nearest', origin='lower')
     axes[0].set_title('Height Map')
     axes[1].imshow(np.rot90(map_features.create_gradient_maps()[4]), cmap='viridis', interpolation='nearest', origin='lower')
     axes[1].set_title('Steepness Map')
     axes[2].imshow(np.rot90(map_features.create_groundwater_map()), cmap='magma', interpolation='nearest', origin='lower')
     axes[2].set_title('Ground Water Map')
+    axes[3].imshow(np.rot90(map_features.create_lava_map()), cmap='magma', interpolation='nearest', origin='lower')
+    axes[3].set_title('Lava Map')
     
     f.tight_layout()
     if save:
